@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icon/串口.png</file>
+        <file>icon/曲线.png</file>
+        <file>icon/设 置.png</file>
+        <file>icon/播放.png</file>
+        <file>icon/停止.png</file>
+    </qresource>
+</RCC>
