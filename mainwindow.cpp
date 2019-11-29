@@ -254,7 +254,6 @@ void MainWindow::on_actionStop_triggered()
     {
         m_serial->close();
     }
-//    delete m_serial;
     comStatus->setStyleSheet(("color:red"));
     QString status = "Closed : " + ui->comboBox_Port->currentText();
     comStatus->setText(status);
