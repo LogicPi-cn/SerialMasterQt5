@@ -7,6 +7,7 @@
 #include <QSerialPortInfo>
 #include <QDebug>
 #include <locale>
+#include <QLabel>
 
 #include <Windows.h>
 #include <Dbt.h>
@@ -49,6 +50,9 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    char ConvertHexChar(char ch);
+    void StringToHex(QString str, QByteArray &senddata);
+
     // 刷新串口列表
     void RefreshComList();
 
@@ -70,10 +74,27 @@ protected:
     bool nativeEvent(const QByteArray &eventType, void *message, long *result);
 
 private slots:
+    // 接收数据
+    void ReceiveData();
+
     void on_actionStart_triggered();
+
+    void on_actionStop_triggered();
+
+    void on_pushButton_ReceiveClear_clicked();
+
+    void on_pushButton_SendClear_clicked();
+
+    void on_pushButton_Send_clicked();
 
 private:
     Ui::MainWindow *ui;
+
+    QSerialPort *m_serial;
+
+    QLabel *comStatus;
+    QLabel *RX_Label;
+    QLabel *TX_Label;
 };
 
 #endif // MAINWINDOW_H

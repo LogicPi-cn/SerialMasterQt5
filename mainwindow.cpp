@@ -7,16 +7,82 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // 串口句柄
+    m_serial = new QSerialPort();
+
     // 注册热插拔检测事件
     RegHandler();
 
     // 刷新串口
     RefreshComList();
+
+    // 清空计数器
+    MainWindow::on_pushButton_SendClear_clicked();
+    MainWindow::on_pushButton_ReceiveClear_clicked();
+
+    // 默认设置
+    ui->comboBox_BaundRate->setCurrentText("115200");
+
+    // 初始化StatusBar
+    comStatus = new QLabel("");
+    ui->statusBar->addWidget(comStatus);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+char MainWindow::ConvertHexChar(char ch)
+{
+    if((ch >= '0') && (ch <= '9'))
+        return ch-0x30;
+    else if((ch >= 'A') && (ch <= 'F'))
+        return ch-'A'+10;
+    else if((ch >= 'a') && (ch <= 'f'))
+        return ch-'a'+10;
+    else return ch-ch;//不在0-f范围内的会发送成0
+}
+
+void MainWindow::StringToHex(QString str, QByteArray &senddata)
+{
+    int hexdata,lowhexdata;
+    int hexdatalen = 0;
+    int len = str.length();
+
+    if(len%2 == 1)   //如果发送的数据个数为奇数的，则在前面最后落单的字符前添加一个字符0
+    {
+        str = str.insert(len-1,'0'); //insert(int position, const QString & str)
+        len = len +1;
+    }
+
+    senddata.resize(len/2);
+    char lstr,hstr;
+
+    for(int i=0; i<len; )
+    {
+        //char lstr,
+        hstr=str[i].toLatin1();
+        if(hstr == ' ')
+        {
+            i++;
+            continue;
+        }
+        i++;
+        if(i >= len)
+            break;
+        lstr = str[i].toLatin1();
+        hexdata = ConvertHexChar(hstr);
+        lowhexdata = ConvertHexChar(lstr);
+        if((hexdata == 16) || (lowhexdata == 16))
+            break;
+        else
+            hexdata = hexdata*16+lowhexdata;
+        i++;
+        senddata[hexdatalen] = (char)hexdata;
+        hexdatalen++;
+    }
+    senddata.resize(hexdatalen);
 }
 
 void MainWindow::RefreshComList()
@@ -34,6 +100,15 @@ void MainWindow::RefreshComList()
 //        qDebug() << "System Location: " << info.systemLocation();
         ui->comboBox_Port->addItem(info.portName());
     }
+}
+
+void MainWindow::ReceiveData()
+{
+    QByteArray info = m_serial->readAll();
+
+    qDebug()<<"receive info:"<<info;
+
+    ui->textEdit_Receive->append(info);
 }
 
 void MainWindow::RegHandler()
@@ -133,5 +208,86 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
 
 void MainWindow::on_actionStart_triggered()
 {
+    QString portName = ui->comboBox_Port->currentText();
+    int bps = ui->comboBox_BaundRate->currentText().toInt();
 
+    m_serial->setPortName(portName);
+    if (!m_serial->open(QIODevice::ReadWrite)){
+        qDebug()<<portName<<"打开失败";
+        return;
+    }else{
+
+        if (bps == 115200) {
+            m_serial->setBaudRate(QSerialPort::Baud115200,QSerialPort::AllDirections);//设置波特率和读写方向
+        }else if (bps == 38400) {
+            m_serial->setBaudRate(QSerialPort::Baud38400,QSerialPort::AllDirections);//设置波特率和读写方向
+        }else if (bps == 57600) {
+            m_serial->setBaudRate(QSerialPort::Baud57600,QSerialPort::AllDirections);//设置波特率和读写方向
+        }else if (bps == 19200) {
+            m_serial->setBaudRate(QSerialPort::Baud19200,QSerialPort::AllDirections);//设置波特率和读写方向
+        }else if (bps == 9600) {
+            m_serial->setBaudRate(QSerialPort::Baud9600,QSerialPort::AllDirections);//设置波特率和读写方向
+        }else if (bps == 4800) {
+            m_serial->setBaudRate(QSerialPort::Baud9600,QSerialPort::AllDirections);//设置波特率和读写方向
+        }else{
+            m_serial->setBaudRate(QSerialPort::Baud115200,QSerialPort::AllDirections);//设置波特率和读写方向
+        }
+
+        m_serial->setDataBits(QSerialPort::Data8);		//数据位为8位
+        m_serial->setFlowControl(QSerialPort::NoFlowControl);//无流控制
+        m_serial->setParity(QSerialPort::NoParity);	//无校验位
+        m_serial->setStopBits(QSerialPort::OneStop); //一位停止位
+
+        connect(m_serial,SIGNAL(readyRead()),this,SLOT(ReceiveData()));
+
+//        ui->actionStart->setDisabled(true);
+        QString status = "Opened : " + portName + ", " + QString::number(bps) + ", N, 8, 1";
+        comStatus->setStyleSheet(("color:green"));
+        comStatus->setText(status);
+
+    }
+}
+
+void MainWindow::on_actionStop_triggered()
+{
+    if (m_serial->isOpen())
+    {
+        m_serial->close();
+    }
+//    delete m_serial;
+    comStatus->setStyleSheet(("color:red"));
+    QString status = "Closed : " + ui->comboBox_Port->currentText();
+    comStatus->setText(status);
+}
+
+void MainWindow::on_pushButton_ReceiveClear_clicked()
+{
+    ui->textEdit_Receive->clear();
+    ui->label_ReceiveCnt->setText("0");
+}
+
+void MainWindow::on_pushButton_SendClear_clicked()
+{
+    ui->textEdit_Send->clear();
+    ui->label_SendCnt->setText("0");
+}
+
+void MainWindow::on_pushButton_Send_clicked()
+{
+    if (m_serial->isOpen()) {
+
+        QString msg = ui->textEdit_Send->toPlainText();
+        QByteArray send_buf;
+
+        if (ui->checkBox_SendAsHex->isChecked()) {
+            StringToHex(msg, send_buf);
+        }else{
+            send_buf = msg.toLatin1();
+        }
+        m_serial->write(send_buf);
+    }else{
+        qDebug() << "Serial Port is not opened.";
+        comStatus->setStyleSheet(("color:red"));
+        comStatus->setText("Port NOT Opened!");
+    }
 }
