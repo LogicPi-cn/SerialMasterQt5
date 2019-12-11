@@ -6,6 +6,8 @@
 
 QT       += core gui serialport
 
+RC_ICONS = icon\serial.ico
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = SerialMaster

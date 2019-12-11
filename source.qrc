@@ -5,5 +5,6 @@
         <file>icon/设 置.png</file>
         <file>icon/播放.png</file>
         <file>icon/停止.png</file>
+        <file>icon/serial.ico</file>
     </qresource>
 </RCC>

@@ -114,6 +114,10 @@ void MainWindow::ReceiveData()
         ui->textEdit_Receive->append(msg);
     }
 
+    if (ui->checkBox_ReceiveAutoNewLine->isChecked()) {
+        ui->textEdit_Receive->append("\n");
+    }
+
 }
 
 void MainWindow::RegHandler()
