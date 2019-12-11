@@ -104,11 +104,16 @@ void MainWindow::RefreshComList()
 
 void MainWindow::ReceiveData()
 {
-    QByteArray info = m_serial->readAll();
+    QByteArray msg = m_serial->readAll();
 
-    qDebug()<<"receive info:"<<info;
+    if (ui->checkBox_ReceiveAsHex->isChecked()) {
+        qDebug() << "Rec hex : " << msg.toHex();
+        ui->textEdit_Receive->append(msg.toHex());
+    }else{
+        qDebug() << "Rec str:" << msg;
+        ui->textEdit_Receive->append(msg);
+    }
 
-    ui->textEdit_Receive->append(info);
 }
 
 void MainWindow::RegHandler()
