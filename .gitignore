@@ -44,3 +44,6 @@ CMakeLists.txt.user*
 /debug
 /release
 /ReleaseOutput
+/InnoSetup
+/Installer
+/*.db

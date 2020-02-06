@@ -5,9 +5,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
+    QString title = QString("SerialMaster ") + (VERSION);
+    setWindowTitle(title);
+
     // 串口句柄
     m_serial = new QSerialPort();
-
+    // 数据库操作
     db_ctrl = new DB_Ctrl();
 
     // 注册热插拔检测事件
@@ -36,6 +39,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // 计数器清零
     receive_cnt = 0;
     send_cnt = 0;
+
+    // 检查更新
+    CheckUpdate();
 }
 
 MainWindow::~MainWindow()
@@ -548,3 +554,72 @@ void MainWindow::on_pushButton_ClearLog_clicked()
 {
     ui->textEdit_Log->setText("");
 }
+
+void MainWindow::on_actionAbout_triggered()
+{
+    Form_About *form = new Form_About();
+    form->show();
+}
+
+void MainWindow::on_actionUpdate_triggered()
+{
+    CheckUpdate();
+}
+
+int MainWindow::parse_UpdateJSON(QString str)
+{
+    QJsonParseError err_rpt;
+    QJsonDocument root_Doc = QJsonDocument::fromJson(str.toUtf8(), &err_rpt);
+    if (err_rpt.error != QJsonParseError::NoError) {
+        QMessageBox::critical(this, "Check Failed", "Wrong JSON format");
+        return -1;
+    }
+    if (root_Doc.isObject()) {
+        QJsonObject root_Obj = root_Doc.object();
+        QJsonObject PulseValue = root_Obj.value("PO").toObject();
+        QString NewVerison = PulseValue.value("LatestVerison").toString();
+        QString Url = PulseValue.value("Url").toString();
+        QString UpdateTime = PulseValue.value("UpdateTime").toString();
+        QString ReleaseNote = PulseValue.value("ReleaseNote").toString();
+
+        qDebug() << "Server Version:" << NewVerison;
+        if (NewVerison > QString(VERSION)) {
+            QString warningStr = "Update Find!\nVersion:" + NewVerison + "\n" + "Description:" + ReleaseNote;
+            int ret = QMessageBox::warning(this, "Check Update", warningStr, "Download", "Cancel");
+            if (ret == 0) {
+                QDesktopServices::openUrl(QUrl(Url));
+            }
+        } else {
+            LogPrint("It's the latest verion.");
+        }
+    }
+    return 0;
+}
+
+void MainWindow::CheckUpdate()
+{
+    LogPrint("Checking update...");
+
+    QNetworkRequest quest;
+    quest.setUrl(QUrl("https://logicpi.oss-cn-hangzhou.aliyuncs.com/Download/"
+                      "SerialMaster/update.json"));
+    quest.setHeader(QNetworkRequest::UserAgentHeader, "LogicPi.cn");
+
+    manager = new QNetworkAccessManager(this);
+    connect(manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(replyFinished(QNetworkReply *)));
+    manager->get(quest);
+}
+
+void MainWindow::replyFinished(QNetworkReply *reply)
+{
+    QString str = reply->readAll();
+    parse_UpdateJSON(str);
+    reply->deleteLater();
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    this->close();
+}
+
+void MainWindow::InitLayout() {}

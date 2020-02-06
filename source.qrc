@@ -6,5 +6,8 @@
         <file>icon/播放.png</file>
         <file>icon/停止.png</file>
         <file>icon/serial.ico</file>
+        <file>icon/about.png</file>
+        <file>icon/update.png</file>
+        <file>icon/exit.png</file>
     </qresource>
 </RCC>

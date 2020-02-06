@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport sql
+QT       += core gui serialport sql network
 
 QMAKE_LFLAGS += /NODEFAULTLIB:LIBCMTD
 
@@ -32,14 +32,18 @@ CONFIG += c++11
 
 SOURCES += \
         db_ctrl.cpp \
+        form_about.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
+        config.h \
         db_ctrl.h \
+        form_about.h \
         mainwindow.h
 
 FORMS += \
+        form_about.ui \
         mainwindow.ui
 
 # Default rules for deployment.

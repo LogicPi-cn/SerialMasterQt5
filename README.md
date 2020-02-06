@@ -8,4 +8,4 @@
 
 	2020.2.6 增加了指令发送功能
 
-![截图](http://logicpi-img.21up.cn/blog_pic/20200206131914.png)
+![截图](http://logicpi-img.21up.cn/blog_pic/20200206163018.png)

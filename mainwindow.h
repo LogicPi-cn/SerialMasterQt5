@@ -4,6 +4,7 @@
 #include <QAbstractNativeEventFilter>
 #include <QCheckBox>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QFileDialog>
 #include <QLabel>
 #include <QMainWindow>
@@ -11,6 +12,9 @@
 #include <QPushButton>
 #include <QSerialPort>
 #include <QSerialPortInfo>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+#include <QtNetwork/QNetworkRequest>
 
 #include <locale>
 
@@ -24,9 +28,9 @@
 
 #include <InitGuid.h>
 
+#include "config.h"
 #include "db_ctrl.h"
-
-#define MAX_CMD_NUM 1024
+#include "form_about.h"
 
 static const GUID GUID_DEVINTERFACE_LIST[] = {
     // CSC板卡
@@ -88,12 +92,23 @@ class MainWindow : public QMainWindow
         return (i + 'A');
     }
 
+    // for Update
+    QNetworkAccessManager *manager;    // network requester
+    int parse_UpdateJSON(QString str); // json parser
+    void CheckUpdate();
+
+    // InitLayout
+    void InitLayout();
+
   protected:
     // 注册热插拔
     void RegHandler();
     bool nativeEvent(const QByteArray &eventType, void *message, long *result);
 
   private slots:
+
+    void replyFinished(QNetworkReply *reply); // network reply
+
     // 接收数据
     void ReceiveData();
 
@@ -118,6 +133,12 @@ class MainWindow : public QMainWindow
     void on_pushButton_SaveAs_clicked();
 
     void on_pushButton_ClearLog_clicked();
+
+    void on_actionAbout_triggered();
+
+    void on_actionUpdate_triggered();
+
+    void on_actionExit_triggered();
 
   private:
     Ui::MainWindow *ui;
