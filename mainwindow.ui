@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>864</width>
-    <height>654</height>
+    <width>986</width>
+    <height>859</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,32 +19,12 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="4" column="2">
-     <widget class="QPushButton" name="pushButton_Send">
-      <property name="text">
-       <string>发送</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0" rowspan="2">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox">
       <property name="minimumSize">
        <size>
-        <width>200</width>
-        <height>22</height>
+        <width>0</width>
+        <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
@@ -186,63 +166,23 @@
       </layout>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QGroupBox" name="groupBox_3">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>110</height>
-       </size>
-      </property>
+    <item row="0" column="4" rowspan="5">
+     <widget class="QGroupBox" name="groupBox_4">
       <property name="title">
-       <string>发送设置</string>
+       <string>接收窗口</string>
       </property>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="1">
-        <widget class="QCheckBox" name="checkBox_SendAsHex">
-         <property name="text">
-          <string>十六进制</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="label_SendCnt">
-         <property name="frameShape">
-          <enum>QFrame::Box</enum>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>发送计数：</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QPushButton" name="pushButton_SendClear">
-         <property name="text">
-          <string>清空</string>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <widget class="QTextEdit" name="textEdit_Receive">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
          </property>
         </widget>
        </item>
       </layout>
-     </widget>
-    </item>
-    <item row="0" column="1" rowspan="4" colspan="2">
-     <widget class="QTextEdit" name="textEdit_Receive">
-      <property name="minimumSize">
-       <size>
-        <width>640</width>
-        <height>480</height>
-       </size>
-      </property>
      </widget>
     </item>
     <item row="1" column="0">
@@ -301,6 +241,110 @@
        <item row="4" column="1">
         <widget class="QPushButton" name="pushButton_ReceiveClear">
          <property name="text">
+          <string>清空接收</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="3" column="5">
+     <widget class="QGroupBox" name="groupBox_5">
+      <property name="title">
+       <string>一般发送</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_6">
+       <item row="1" column="0" rowspan="3">
+        <widget class="QTextEdit" name="textEdit_Send">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>200</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QPushButton" name="pushButton_Send">
+         <property name="maximumSize">
+          <size>
+           <width>80</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>发送</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="5" rowspan="3">
+     <widget class="QGroupBox" name="groupBox_6">
+      <property name="title">
+       <string>指令发送</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_7">
+       <item row="3" column="1">
+        <widget class="QPushButton" name="pushButton_LoadCmd">
+         <property name="text">
+          <string>读取</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QPushButton" name="pushButton_SaveAs">
+         <property name="text">
+          <string>另存</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QPushButton" name="pushButton_RemoveCmd">
+         <property name="text">
+          <string>删除</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="pushButton_AddCmd">
+         <property name="text">
+          <string>添加</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QPushButton" name="pushButton_SaveAllCmd">
+         <property name="text">
+          <string>保存</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2" rowspan="6">
+        <widget class="QTableWidget" name="tableWidget_SendCmd"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="4" column="5">
+     <widget class="QGroupBox" name="groupBox_7">
+      <property name="title">
+       <string>日志</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_8">
+       <item row="0" column="0">
+        <widget class="QTextEdit" name="textEdit_Log"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPushButton" name="pushButton_ClearLog">
+         <property name="maximumSize">
+          <size>
+           <width>80</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
           <string>清空</string>
          </property>
         </widget>
@@ -308,14 +352,53 @@
       </layout>
      </widget>
     </item>
-    <item row="4" column="1">
-     <widget class="QTextEdit" name="textEdit_Send">
+    <item row="2" column="0">
+     <widget class="QGroupBox" name="groupBox_3">
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>200</height>
+        <height>110</height>
        </size>
       </property>
+      <property name="title">
+       <string>发送设置</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>发送计数：</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QPushButton" name="pushButton_SendClear">
+         <property name="text">
+          <string>计数清零</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_SendCnt">
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QCheckBox" name="checkBox_SendAsHex">
+         <property name="text">
+          <string>十六进制</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
@@ -325,8 +408,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>864</width>
-     <height>23</height>
+     <width>986</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

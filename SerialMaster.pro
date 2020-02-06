@@ -4,7 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport
+QT       += core gui serialport sql
+
+QMAKE_LFLAGS += /NODEFAULTLIB:LIBCMTD
 
 RC_ICONS = icon\serial.ico
 
@@ -29,10 +31,12 @@ LIBS += -luser32
 CONFIG += c++11
 
 SOURCES += \
+        db_ctrl.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
+        db_ctrl.h \
         mainwindow.h
 
 FORMS += \
