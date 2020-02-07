@@ -12,11 +12,11 @@ int main(int argc, char *argv[])
     splash.show();
 
     // Delay
-    QDateTime n = QDateTime::currentDateTime();
-    QDateTime now;
-    do {
-        now = QDateTime::currentDateTime();
-    } while (n.secsTo(now) <= 0.5);
+    //    QDateTime n = QDateTime::currentDateTime();
+    //    QDateTime now;
+    //    do {
+    //        now = QDateTime::currentDateTime();
+    //    } while (n.secsTo(now) <= 0.5);
 
     // Main Window
     MainWindow w;

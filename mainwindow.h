@@ -69,6 +69,9 @@ class MainWindow : public QMainWindow
     char ConvertHexChar(char ch);
     void StringToHex(QString str, QByteArray &senddata);
 
+    // Layout Initiailization
+    void InitLayout();
+
     // 日志打印
     void LogPrint(const QString msg);
 
@@ -97,15 +100,14 @@ class MainWindow : public QMainWindow
     int parse_UpdateJSON(QString str); // json parser
     void CheckUpdate();
 
-    // InitLayout
-    void InitLayout();
-
   protected:
     // 注册热插拔
     void RegHandler();
     bool nativeEvent(const QByteArray &eventType, void *message, long *result);
 
   private slots:
+
+    void ResetLayout();
 
     void replyFinished(QNetworkReply *reply); // network reply
 
@@ -139,6 +141,8 @@ class MainWindow : public QMainWindow
     void on_actionUpdate_triggered();
 
     void on_actionExit_triggered();
+
+    void on_actionResetAll_triggered();
 
   private:
     Ui::MainWindow *ui;

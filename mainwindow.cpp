@@ -42,6 +42,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // 检查更新
     CheckUpdate();
+
+    // InitLayout
+    InitLayout();
 }
 
 MainWindow::~MainWindow()
@@ -334,6 +337,31 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
     return false;
 }
 
+void MainWindow::ResetLayout()
+{
+    // Remove all dockwidget
+    removeDockWidget(ui->dockWidget_Log);
+    removeDockWidget(ui->dockWidget_CmdSend);
+    removeDockWidget(ui->dockWidget_Receive);
+    removeDockWidget(ui->dockWidget_Setting);
+
+    // Add Dockwidget
+    addDockWidget(Qt::LeftDockWidgetArea, ui->dockWidget_Setting);
+    splitDockWidget(ui->dockWidget_Setting, ui->dockWidget_Receive, Qt::Horizontal);
+    splitDockWidget(ui->dockWidget_Receive, ui->dockWidget_CmdSend, Qt::Horizontal);
+    addDockWidget(Qt::BottomDockWidgetArea, ui->dockWidget_Log);
+
+    // Show
+    ui->dockWidget_Log->show();
+    ui->dockWidget_CmdSend->show();
+    ui->dockWidget_Receive->show();
+    ui->dockWidget_Setting->show();
+
+    // Set Size
+    ui->dockWidget_Setting->setMaximumWidth(300);
+    ui->dockWidget_Log->setMaximumHeight(200);
+}
+
 void MainWindow::on_actionStart_triggered()
 {
     QString portName = ui->comboBox_Port->currentText();
@@ -622,4 +650,23 @@ void MainWindow::on_actionExit_triggered()
     this->close();
 }
 
-void MainWindow::InitLayout() {}
+void MainWindow::InitLayout()
+{
+    // remove central widget
+    QWidget *p = takeCentralWidget();
+    if (p) {
+        delete p;
+    }
+    // allow embeded docking
+    setDockNestingEnabled(true);
+
+    ResetLayout();
+
+    // Run to Maximize
+    setWindowState(Qt::WindowMaximized);
+}
+
+void MainWindow::on_actionResetAll_triggered()
+{
+    ResetLayout();
+}
