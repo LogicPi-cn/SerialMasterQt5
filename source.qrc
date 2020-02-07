@@ -9,5 +9,6 @@
         <file>icon/about.png</file>
         <file>icon/update.png</file>
         <file>icon/exit.png</file>
+        <file>icon/LogicPi.cn.png</file>
     </qresource>
 </RCC>
