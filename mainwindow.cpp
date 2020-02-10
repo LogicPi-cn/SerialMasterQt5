@@ -244,12 +244,23 @@ void MainWindow::ReceiveData()
 {
     QByteArray msg = m_serial->readAll();
 
+    if (msg.isEmpty()) {
+        return;
+    }
+
+    qDebug() << "msg length:" << msg.length();
+
     if (ui->checkBox_ReceiveAsHex->isChecked()) {
         qDebug() << "Rec hex : " << msg.toHex();
-        ui->textEdit_Receive->append(msg.toHex());
+        ui->textEdit_Receive->moveCursor(QTextCursor::End);
+        ui->textEdit_Receive->insertPlainText(msg.toHex());
+        ui->textEdit_Receive->moveCursor(QTextCursor::End);
+        //        ui->textEdit_Receive->append(msg.toHex());
     } else {
         qDebug() << "Rec str:" << msg;
-        ui->textEdit_Receive->append(msg);
+        ui->textEdit_Receive->moveCursor(QTextCursor::End);
+        ui->textEdit_Receive->insertPlainText(msg);
+        ui->textEdit_Receive->moveCursor(QTextCursor::End);
     }
 
     if (ui->checkBox_ReceiveAutoNewLine->isChecked()) {
@@ -599,7 +610,7 @@ int MainWindow::parse_UpdateJSON(QString str)
     QJsonParseError err_rpt;
     QJsonDocument root_Doc = QJsonDocument::fromJson(str.toUtf8(), &err_rpt);
     if (err_rpt.error != QJsonParseError::NoError) {
-        QMessageBox::critical(this, "Check Failed", "Wrong JSON format");
+        QMessageBox::critical(this, "Check Failed", "Connection Error!");
         return -1;
     }
     if (root_Doc.isObject()) {
