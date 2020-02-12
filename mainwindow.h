@@ -5,11 +5,13 @@
 #include <QCheckBox>
 #include <QDebug>
 #include <QDesktopServices>
+#include <QDesktopWidget>
 #include <QFileDialog>
 #include <QLabel>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRect>
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QtNetwork/QNetworkAccessManager>
@@ -107,7 +109,8 @@ class MainWindow : public QMainWindow
 
   private slots:
 
-    void ResetLayout();
+    void FullLayout();
+    void LiteLayout();
 
     void replyFinished(QNetworkReply *reply); // network reply
 
@@ -143,6 +146,8 @@ class MainWindow : public QMainWindow
     void on_actionExit_triggered();
 
     void on_actionResetAll_triggered();
+
+    void on_actionLite_triggered();
 
   private:
     Ui::MainWindow *ui;

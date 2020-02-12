@@ -348,29 +348,66 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
     return false;
 }
 
-void MainWindow::ResetLayout()
+void MainWindow::FullLayout()
 {
     // Remove all dockwidget
     removeDockWidget(ui->dockWidget_Log);
     removeDockWidget(ui->dockWidget_CmdSend);
-    removeDockWidget(ui->dockWidget_Receive);
+    //    removeDockWidget(ui->dockWidget_Receive);
     removeDockWidget(ui->dockWidget_Setting);
 
     // Add Dockwidget
     addDockWidget(Qt::LeftDockWidgetArea, ui->dockWidget_Setting);
-    splitDockWidget(ui->dockWidget_Setting, ui->dockWidget_Receive, Qt::Horizontal);
-    splitDockWidget(ui->dockWidget_Receive, ui->dockWidget_CmdSend, Qt::Horizontal);
+    //    splitDockWidget(ui->dockWidget_Setting, ui->dockWidget_Receive, Qt::Horizontal);
+    //    splitDockWidget(ui->dockWidget_Receive, ui->dockWidget_CmdSend, Qt::Horizontal);
+    addDockWidget(Qt::RightDockWidgetArea, ui->dockWidget_CmdSend);
     addDockWidget(Qt::BottomDockWidgetArea, ui->dockWidget_Log);
+
+    QDesktopWidget *desktopWidget = QApplication::desktop();
+    QRect deskRect = desktopWidget->availableGeometry(this);
+    QRect screenRect = desktopWidget->screenGeometry(this);
+
+    int g_nActScreenX = screenRect.width();
+    int g_nActScreenY = screenRect.height();
+    int desk_width = deskRect.width();
+    int desk_height = deskRect.height();
+
+    qDebug() << "Screen Size:" << g_nActScreenX << g_nActScreenY;
+    qDebug() << "Desktop Size:" << desk_width << desk_height;
+
+    // Set Size
+    ui->dockWidget_Setting->setMaximumWidth(250);
+    ui->dockWidget_Log->setMaximumHeight(desk_height / 5);
+    ui->textEdit_Send->setMaximumHeight(100);
 
     // Show
     ui->dockWidget_Log->show();
     ui->dockWidget_CmdSend->show();
-    ui->dockWidget_Receive->show();
+    //    ui->dockWidget_Receive->show();
+    ui->dockWidget_Setting->show();
+
+    // Maximize
+    setWindowState(Qt::WindowMaximized);
+}
+
+void MainWindow::LiteLayout()
+{
+    // Remove all dockwidget
+    removeDockWidget(ui->dockWidget_Log);
+    removeDockWidget(ui->dockWidget_CmdSend);
+    removeDockWidget(ui->dockWidget_Setting);
+
+    // Add Dockwidget
+    addDockWidget(Qt::LeftDockWidgetArea, ui->dockWidget_Setting);
+
+    // Show
     ui->dockWidget_Setting->show();
 
     // Set Size
-    ui->dockWidget_Setting->setMaximumWidth(300);
-    ui->dockWidget_Log->setMaximumHeight(200);
+    ui->dockWidget_Setting->setMaximumWidth(250);
+    ui->textEdit_Send->setMaximumHeight(100);
+
+    resize(640, 480);
 }
 
 void MainWindow::on_actionStart_triggered()
@@ -664,20 +701,24 @@ void MainWindow::on_actionExit_triggered()
 void MainWindow::InitLayout()
 {
     // remove central widget
-    QWidget *p = takeCentralWidget();
-    if (p) {
-        delete p;
-    }
+    //    QWidget *p = takeCentralWidget();
+    //    if (p) {
+    //        delete p;
+    //    }
+
     // allow embeded docking
     setDockNestingEnabled(true);
 
-    ResetLayout();
-
-    // Run to Maximize
-    setWindowState(Qt::WindowMaximized);
+    // Lite as default
+    LiteLayout();
 }
 
 void MainWindow::on_actionResetAll_triggered()
 {
-    ResetLayout();
+    FullLayout();
+}
+
+void MainWindow::on_actionLite_triggered()
+{
+    LiteLayout();
 }
