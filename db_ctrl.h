@@ -17,8 +17,8 @@ class DB_Ctrl
     DB_Ctrl();
 
     // Open&Close DB
-    bool open_db();
-    void close_db();
+    bool OpenDB();
+    void CloseDB();
 
     // Command Table
     bool CreateCmdTable();

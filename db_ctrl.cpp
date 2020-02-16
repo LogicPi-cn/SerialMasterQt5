@@ -2,7 +2,7 @@
 
 DB_Ctrl::DB_Ctrl() {}
 
-bool DB_Ctrl::open_db()
+bool DB_Ctrl::OpenDB()
 {
     if (QSqlDatabase::contains(DB_NAME)) {
         db = QSqlDatabase::database(DB_NAME);
@@ -35,7 +35,7 @@ bool DB_Ctrl::open_db()
     }
 }
 
-void DB_Ctrl::close_db()
+void DB_Ctrl::CloseDB()
 {
     db.close();
 }
@@ -289,5 +289,14 @@ bool DB_Ctrl::ReadSetting(const QString &parameter, QString &value)
 
 void DB_Ctrl::InsertDefaultSetting()
 {
-    InsertSetting("camera_expo", "50");
+    // Default Mode
+    InsertSetting("mode", "0"); // 0-> Lite, 1->Full;
+
+    // Plotting->LineColor
+    InsertSetting("line_colr_r", "0");
+    InsertSetting("line_colr_g", "0");
+    InsertSetting("line_colr_b", "255");
+
+    InsertSetting("tx_end_str", "\n"); // End String
+    InsertSetting("rx_end_str", "\n"); // End String
 }

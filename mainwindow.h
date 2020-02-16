@@ -33,6 +33,7 @@
 #include "db_ctrl.h"
 #include "form_about.h"
 #include "form_draw_curve.h"
+#include "form_setting.h"
 #include "qcustomplot.h"
 
 static const GUID GUID_DEVINTERFACE_LIST[] = {
@@ -72,9 +73,11 @@ class MainWindow : public QMainWindow
     char ConvertHexChar(char ch);
     void StringToHex(QString str, QByteArray &senddata);
 
+    // Load Setting
+    void LoadSetting();
+
     // Layout Initiailization
     void InitLayout();
-
     void InitPlotLayout();
 
     // 日志打印
@@ -148,11 +151,17 @@ class MainWindow : public QMainWindow
 
     void on_actionExit_triggered();
 
-    void on_actionResetAll_triggered();
-
     void on_actionLite_triggered();
 
     void on_actionCurve_triggered();
+
+    void on_actionFull_triggered();
+
+    void on_checkBox_SendLoop_toggled(bool checked);
+
+    void on_actionSetting_triggered();
+
+    void on_actionLoadDefault_triggered();
 
   private:
     Ui::MainWindow *ui;
@@ -163,6 +172,19 @@ class MainWindow : public QMainWindow
 
     int receive_cnt;
     int send_cnt;
+
+    // End String , \n or \r or \n\r or \r\n
+    QString tx_end_str;
+    QString rx_end_str;
+
+    // Line Color
+    int line_color_r;
+    int line_color_g;
+    int line_color_b;
+
+    // Send Loop
+    QThread *m_pThread;
+    QTimer *m_pTimer;
 
     // Curve Widget
     QWidget *widgetCurve;

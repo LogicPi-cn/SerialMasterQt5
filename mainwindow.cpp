@@ -111,6 +111,39 @@ void MainWindow::StringToHex(QString str, QByteArray &senddata)
     senddata.resize(hexdatalen);
 }
 
+void MainWindow::LoadSetting()
+{
+    db_ctrl->OpenDB();
+
+    // Line Color
+    QString r, g, b;
+    if (!db_ctrl->ReadSetting("line_color_r", r)) {
+        line_color_r = 0;
+    } else {
+        line_color_r = r.toInt();
+    }
+    if (!db_ctrl->ReadSetting("line_color_g", g)) {
+        line_color_g = 0;
+    } else {
+        line_color_g = g.toInt();
+    }
+    if (!db_ctrl->ReadSetting("line_color_b", b)) {
+        line_color_b = 255;
+    } else {
+        line_color_b = b.toInt();
+    }
+
+    // End String
+    if (!db_ctrl->ReadSetting("tx_end_str", tx_end_str)) {
+        tx_end_str = "\n";
+    }
+    if (!db_ctrl->ReadSetting("rx_end_str", rx_end_str)) {
+        rx_end_str = "\n";
+    }
+
+    db_ctrl->CloseDB();
+}
+
 void MainWindow::RefreshComList()
 {
     QSerialPortInfo com_info;
@@ -172,7 +205,7 @@ void MainWindow::AddEmptyRowInCommandTable(const int &row, const bool &hex)
 void MainWindow::RefreshCmdTable()
 {
     // Open DB
-    db_ctrl->open_db();
+    db_ctrl->OpenDB();
 
     // Set Table Cnt
     int row_cnt = db_ctrl->GetCommandNum();
@@ -199,7 +232,7 @@ void MainWindow::RefreshCmdTable()
     }
 
     // Close DB
-    db_ctrl->close_db();
+    db_ctrl->CloseDB();
 }
 
 void MainWindow::SendTableCommand(const int &row)
@@ -251,12 +284,23 @@ void MainWindow::ReceiveData()
 
     qDebug() << "msg length:" << msg.length();
 
-    if (ui->checkBox_ReceiveAsHex->isChecked()) {
+    bool showtime = ui->checkBox_ReceiveShowTime->isChecked();
+    bool hex = ui->checkBox_ReceiveAsHex->isChecked();
+    bool newline = ui->checkBox_ReceiveAutoNewLine->isChecked();
+
+    if (showtime) {
+        QDateTime time = QDateTime::currentDateTime();
+        QString str = time.toString("yyyy-MM-dd hh:mm:ss.zzz : ");
+        ui->textEdit_Receive->moveCursor(QTextCursor::End);
+        ui->textEdit_Receive->insertPlainText(str);
+        ui->textEdit_Receive->moveCursor(QTextCursor::End);
+    }
+
+    if (hex) {
         qDebug() << "Rec hex : " << msg.toHex();
         ui->textEdit_Receive->moveCursor(QTextCursor::End);
         ui->textEdit_Receive->insertPlainText(msg.toHex());
         ui->textEdit_Receive->moveCursor(QTextCursor::End);
-        //        ui->textEdit_Receive->append(msg.toHex());
     } else {
         qDebug() << "Rec str:" << msg;
         ui->textEdit_Receive->moveCursor(QTextCursor::End);
@@ -264,18 +308,22 @@ void MainWindow::ReceiveData()
         ui->textEdit_Receive->moveCursor(QTextCursor::End);
     }
 
-    if (ui->checkBox_ReceiveAutoNewLine->isChecked()) {
-        ui->textEdit_Receive->append("\n");
+    if (showtime) {
+        ui->textEdit_Receive->append(rx_end_str);
+    } else {
+        if (newline) {
+            ui->textEdit_Receive->append(rx_end_str);
+        }
     }
 
-    // 计数
+    // Count
     receive_cnt += msg.length();
     ui->label_ReceiveCnt->setText(QString::number(receive_cnt));
 }
 
 void MainWindow::RegHandler()
 {
-    //注册插拔事件
+    // Hot Plug
     HDEVNOTIFY hDevNotify;
     DEV_BROADCAST_DEVICEINTERFACE NotifacationFiler;
     ZeroMemory(&NotifacationFiler, sizeof(DEV_BROADCAST_DEVICEINTERFACE));
@@ -287,7 +335,7 @@ void MainWindow::RegHandler()
         hDevNotify = RegisterDeviceNotification((HANDLE)this->winId(), &NotifacationFiler, DEVICE_NOTIFY_WINDOW_HANDLE);
         if (!hDevNotify) {
             int Err = GetLastError();
-            qDebug() << "Failed to Reg" << Err;
+            qDebug() << "Failed to Register" << Err;
         }
     }
 }
@@ -487,18 +535,24 @@ void MainWindow::on_pushButton_Send_clicked()
         QString msg = ui->textEdit_Send->toPlainText();
         QByteArray send_buf;
 
+        // HEX or not
         if (ui->checkBox_SendAsHex->isChecked()) {
             StringToHex(msg, send_buf);
         } else {
             send_buf = msg.toLatin1();
         }
+
+        // Add End String
+        if (ui->checkBox_SendAutoNewLine->isChecked()) {
+            send_buf += tx_end_str;
+        }
         m_serial->write(send_buf);
 
-        // 计数
+        // Count
         send_cnt += send_buf.length();
         ui->label_SendCnt->setText(QString::number(send_cnt));
 
-        // 日志
+        // Log
         QString log = "[Send] " + msg;
         LogPrint(log);
     } else {
@@ -542,7 +596,7 @@ void MainWindow::on_pushButton_SaveAllCmd_clicked()
     qDebug() << "Table Row Cnt:" << row_cnt;
 
     // Save
-    db_ctrl->open_db();
+    db_ctrl->OpenDB();
     for (int i = 0; i < row_cnt; i++) {
         // check if Blank
         QString name = "";
@@ -577,10 +631,10 @@ void MainWindow::on_pushButton_SaveAllCmd_clicked()
             qDebug() << success;
         }
     }
-    db_ctrl->close_db();
+    db_ctrl->CloseDB();
 
     // delete rows
-    db_ctrl->open_db();
+    db_ctrl->OpenDB();
     int db_row_cnt = db_ctrl->GetCommandNum();
     qDebug() << "DB Row Cnt:" << db_row_cnt;
     if (row_cnt < db_row_cnt) {
@@ -588,7 +642,7 @@ void MainWindow::on_pushButton_SaveAllCmd_clicked()
             db_ctrl->DeleteCommand(i);
         }
     }
-    db_ctrl->close_db();
+    db_ctrl->CloseDB();
 
     QMessageBox::information(nullptr, "Saved!", "Saved success.");
 
@@ -723,10 +777,6 @@ void MainWindow::InitPlotLayout()
     // Plot
     m_plot = new QCustomPlot(widgetCurve);
 
-    // Maing Group
-    QGroupBox *maingroup = new QGroupBox(widgetCurve);
-    maingroup->setTitle("Setting");
-
     // Data Length
     QGroupBox *groupBox_DataLength = new QGroupBox(widgetCurve);
     groupBox_DataLength->setTitle("Data Length");
@@ -758,7 +808,7 @@ void MainWindow::InitPlotLayout()
         QLabel *label = new QLabel(widgetCurve);
         label->setText("Line:");
         pushButton_SetLineColor = new QPushButton(widgetCurve);
-        pushButton_SetLineColor->setText("Set");
+        pushButton_SetLineColor->setText("Select");
 
         label_LineColorShow = new QLabel(widgetCurve);
         QPalette sample_palette;
@@ -772,8 +822,21 @@ void MainWindow::InitPlotLayout()
         gridlayout->addWidget(pushButton_SetLineColor, 0, 2, 0, 1);
     }
 
-    // Setting Gridlayout
-    QGridLayout *gridlayout_Setting = new QGridLayout(maingroup);
+    // Setting Docker
+    //    QWidget *dock_Contnent = new QWidget();
+    //    dock_Contnent->setObjectName(QString::fromUtf8("dock_Contnent"));
+
+    //    QDockWidget *settingWidget = new QDockWidget(this);
+    //    settingWidget->setObjectName(QString::fromUtf8("dockWidgetPlotTool"));
+    //    settingWidget->setWindowTitle(QApplication::translate("this", "Plot Setting", nullptr));
+    //    settingWidget->setWidget(dock_Contnent);
+    //    settingWidget->setMaximumWidth(200);
+
+    QGroupBox *settingGroup = new QGroupBox(widgetCurve);
+    settingGroup->setTitle("Setting");
+
+    // Grid for Setting
+    QGridLayout *gridlayout_Setting = new QGridLayout(settingGroup);
     gridlayout_Setting->addWidget(groupBox_DataLength, 0, 0, 1, 1);
     gridlayout_Setting->addWidget(groupBox_CurveColor, 1, 0, 1, 1);
 
@@ -782,13 +845,8 @@ void MainWindow::InitPlotLayout()
 
     // Main Grid
     QGridLayout *gridlayout_Main = new QGridLayout(widgetCurve);
-    gridlayout_Main->addWidget(m_plot, 0, 0, 0, 4);
-    gridlayout_Main->addWidget(maingroup, 0, 5, 0, 1);
-}
-
-void MainWindow::on_actionResetAll_triggered()
-{
-    FullLayout();
+    gridlayout_Main->addWidget(m_plot, 0, 0, 1, 4);
+    gridlayout_Main->addWidget(settingGroup, 0, 5, 1, 1);
 }
 
 void MainWindow::on_actionLite_triggered()
@@ -799,4 +857,65 @@ void MainWindow::on_actionLite_triggered()
 void MainWindow::on_actionCurve_triggered()
 {
     widgetCurve->show();
+}
+
+void MainWindow::on_actionFull_triggered()
+{
+    FullLayout();
+}
+
+void MainWindow::on_checkBox_SendLoop_toggled(bool checked)
+{
+    bool ok;
+    int interval = ui->lineEdit_SendLoopInterval->text().toInt(&ok);
+    if (!ok) {
+        qDebug() << "Convert to Int Failed.";
+        return;
+    }
+
+    if (interval == 0) {
+        QMessageBox::warning(this, "Oops!", "Interval CANNOT be ZERO!");
+        return;
+    }
+
+    if (checked) {
+        qDebug() << "Timer Start, Interval :" << interval;
+        m_pThread = new QThread();
+        m_pTimer = new QTimer();
+        m_pTimer->moveToThread(m_pThread);
+        m_pTimer->setInterval(interval);
+        connect(m_pThread, SIGNAL(started()), m_pTimer, SLOT(start()));
+        connect(m_pTimer, &QTimer::timeout, this, &MainWindow::on_pushButton_Send_clicked);
+        m_pThread->start();
+    } else {
+        qDebug() << "Timer Stopped.";
+        if (m_pThread) {
+            m_pThread->exit();
+        }
+    }
+}
+
+void MainWindow::on_actionSetting_triggered()
+{
+    Form_Setting *form = new Form_Setting();
+    form->show();
+}
+
+void MainWindow::on_actionLoadDefault_triggered()
+{
+    QMessageBox::StandardButton rb =
+        QMessageBox::warning(nullptr,
+                             "Notice!",
+                             "All user settings and data will be lost, would like to continue?",
+                             QMessageBox::Yes | QMessageBox::No,
+                             QMessageBox::No);
+    if (rb == QMessageBox::Yes) {
+        db_ctrl->OpenDB();
+        db_ctrl->DeleteSettingTable();
+        db_ctrl->CloseDB();
+
+        QMessageBox::warning(nullptr, "Notice!", "Please restart the software!");
+        // Close Main Window
+        this->close();
+    }
 }

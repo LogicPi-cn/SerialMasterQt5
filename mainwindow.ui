@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1040</width>
-    <height>713</height>
+    <width>1018</width>
+    <height>697</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>SerialMaster</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="source.qrc">
+   <iconset>
     <normaloff>:/icon/串口.png</normaloff>:/icon/串口.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -59,7 +59,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1040</width>
+     <width>1018</width>
      <height>22</height>
     </rect>
    </property>
@@ -68,6 +68,9 @@
      <string>File</string>
     </property>
     <addaction name="separator"/>
+    <addaction name="actionSaveSetting"/>
+    <addaction name="actionLoadSetting"/>
+    <addaction name="actionLoadDefault"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menu_3">
@@ -76,7 +79,7 @@
     </property>
     <addaction name="separator"/>
     <addaction name="actionLite"/>
-    <addaction name="actionResetAll"/>
+    <addaction name="actionFull"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menu_4">
@@ -119,17 +122,17 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QGridLayout" name="gridLayout_4">
-     <item row="2" column="0">
-      <widget class="QPushButton" name="pushButton_SaveAllCmd">
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QPushButton" name="pushButton_RemoveCmd">
        <property name="text">
         <string>Delete</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="pushButton_SaveAllCmd">
+       <property name="text">
+        <string>Save</string>
        </property>
       </widget>
      </item>
@@ -140,21 +143,7 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QPushButton" name="pushButton_LoadCmd">
-       <property name="text">
-        <string>Load</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QPushButton" name="pushButton_SaveAs">
-       <property name="text">
-        <string>SaveAs</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1" rowspan="6">
+     <item row="0" column="1" rowspan="4">
       <widget class="QTableWidget" name="tableWidget_SendCmd"/>
      </item>
     </layout>
@@ -194,23 +183,6 @@
         <string>Send</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="2" column="1">
-         <widget class="QLabel" name="label_SendCnt">
-          <property name="frameShape">
-           <enum>QFrame::Box</enum>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QCheckBox" name="checkBox_SendAsHex">
-          <property name="text">
-           <string>HEX</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="1">
          <widget class="QPushButton" name="pushButton_SendClear">
           <property name="text">
@@ -218,13 +190,53 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_9">
+        <item row="4" column="0">
+         <widget class="QCheckBox" name="checkBox_SendLoop">
           <property name="text">
-           <string>Count:</string>
+           <string>Loop(ms)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="lineEdit_SendLoopInterval">
+          <property name="maximumSize">
+           <size>
+            <width>80</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>1000</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_SendCnt">
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="checkBox_SendAsHex">
+          <property name="text">
+           <string>HEX</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QCheckBox" name="checkBox_SendAutoNewLine">
+          <property name="text">
+           <string>NewLine</string>
           </property>
          </widget>
         </item>
@@ -391,6 +403,20 @@
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="3" column="1">
+         <widget class="QCheckBox" name="checkBox_ReceiveShowTime">
+          <property name="text">
+           <string>ShowTime</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QPushButton" name="pushButton_ReceiveClear">
+          <property name="text">
+           <string>Clear</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
          <widget class="QLabel" name="label_ReceiveCnt">
           <property name="frameShape">
            <enum>QFrame::Box</enum>
@@ -398,43 +424,22 @@
           <property name="text">
            <string/>
           </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QCheckBox" name="checkBox_ReceiveShowTime">
-          <property name="text">
-           <string>ShowTime</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QCheckBox" name="checkBox_ReceiveAutoNewLine">
-          <property name="text">
-           <string>NewLine</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Count:</string>
-          </property>
           <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
-         <widget class="QPushButton" name="pushButton_ReceiveClear">
-          <property name="text">
-           <string>Clear</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
+        <item row="2" column="0">
          <widget class="QCheckBox" name="checkBox_ReceiveAsHex">
           <property name="text">
            <string>HEX</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QCheckBox" name="checkBox_ReceiveAutoNewLine">
+          <property name="text">
+           <string>NewLine</string>
           </property>
          </widget>
         </item>
@@ -475,7 +480,7 @@
   <action name="actionSetting">
    <property name="icon">
     <iconset resource="source.qrc">
-     <normaloff>:/icon/设 置.png</normaloff>:/icon/设 置.png</iconset>
+     <normaloff>:/icon/setting.png</normaloff>:/icon/setting.png</iconset>
    </property>
    <property name="text">
     <string>Setting</string>
@@ -484,7 +489,7 @@
   <action name="actionCurve">
    <property name="icon">
     <iconset resource="source.qrc">
-     <normaloff>:/icon/曲线.png</normaloff>:/icon/曲线.png</iconset>
+     <normaloff>:/icon/curve.png</normaloff>:/icon/curve.png</iconset>
    </property>
    <property name="text">
     <string>Plotting</string>
@@ -493,7 +498,7 @@
   <action name="actionStart">
    <property name="icon">
     <iconset resource="source.qrc">
-     <normaloff>:/icon/播放.png</normaloff>:/icon/播放.png</iconset>
+     <normaloff>:/icon/start.png</normaloff>:/icon/start.png</iconset>
    </property>
    <property name="text">
     <string>Start</string>
@@ -502,7 +507,7 @@
   <action name="actionStop">
    <property name="icon">
     <iconset resource="source.qrc">
-     <normaloff>:/icon/停止.png</normaloff>:/icon/停止.png</iconset>
+     <normaloff>:/icon/stop.png</normaloff>:/icon/stop.png</iconset>
    </property>
    <property name="text">
     <string>Stop</string>
@@ -535,14 +540,52 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionResetAll">
+  <action name="actionFull">
+   <property name="icon">
+    <iconset resource="source.qrc">
+     <normaloff>:/icon/full.png</normaloff>:/icon/full.png</iconset>
+   </property>
    <property name="text">
     <string>Full</string>
    </property>
   </action>
   <action name="actionLite">
+   <property name="icon">
+    <iconset resource="source.qrc">
+     <normaloff>:/icon/lite.png</normaloff>:/icon/lite.png</iconset>
+   </property>
    <property name="text">
     <string>Lite</string>
+   </property>
+  </action>
+  <action name="actionLoadSetting">
+   <property name="icon">
+    <iconset resource="source.qrc">
+     <normaloff>:/icon/load.png</normaloff>:/icon/load.png</iconset>
+   </property>
+   <property name="text">
+    <string>LoadSetting</string>
+   </property>
+   <property name="toolTip">
+    <string>LoadSetting</string>
+   </property>
+  </action>
+  <action name="actionSaveSetting">
+   <property name="icon">
+    <iconset resource="source.qrc">
+     <normaloff>:/icon/saveas.png</normaloff>:/icon/saveas.png</iconset>
+   </property>
+   <property name="text">
+    <string>SaveSetting</string>
+   </property>
+  </action>
+  <action name="actionLoadDefault">
+   <property name="icon">
+    <iconset resource="source.qrc">
+     <normaloff>:/icon/refresh.png</normaloff>:/icon/refresh.png</iconset>
+   </property>
+   <property name="text">
+    <string>LoadDefault</string>
    </property>
   </action>
  </widget>

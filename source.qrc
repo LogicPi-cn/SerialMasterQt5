@@ -1,14 +1,20 @@
 <RCC>
     <qresource prefix="/">
-        <file>icon/串口.png</file>
-        <file>icon/曲线.png</file>
-        <file>icon/设 置.png</file>
-        <file>icon/播放.png</file>
-        <file>icon/停止.png</file>
         <file>icon/serial.ico</file>
         <file>icon/about.png</file>
         <file>icon/update.png</file>
         <file>icon/exit.png</file>
         <file>icon/LogicPi.cn.png</file>
+        <file>icon/curve.png</file>
+        <file>icon/load.png</file>
+        <file>icon/logo.ico</file>
+        <file>icon/saveas.png</file>
+        <file>icon/serial.png</file>
+        <file>icon/setting.png</file>
+        <file>icon/start.png</file>
+        <file>icon/stop.png</file>
+        <file>icon/full.png</file>
+        <file>icon/lite.png</file>
+        <file>icon/refresh.png</file>
     </qresource>
 </RCC>
