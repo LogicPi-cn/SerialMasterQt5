@@ -10,10 +10,16 @@ bool DB_Ctrl::open_db()
         db = QSqlDatabase::addDatabase("QSQLITE", DB_NAME);
         db.setDatabaseName(DB_NAME);
         if (db.open()) {
-            if (create_cmd_table()) {
-                qDebug() << "Create Table Success";
+            if (CreateCmdTable()) {
+                qDebug() << "Create Command Table Success";
             } else {
-                qDebug() << "Create Table Failed or NO Need to Create";
+                qDebug() << "Create Command Table Failed or NO Need to Create";
+            }
+            if (CreateSettingTable()) {
+                InsertDefaultSetting();
+                qDebug() << "Create Setting Table Success";
+            } else {
+                qDebug() << "Create Setting Table Failed or NO Need to Create";
             }
         }
     }
@@ -34,7 +40,7 @@ void DB_Ctrl::close_db()
     db.close();
 }
 
-bool DB_Ctrl::create_cmd_table()
+bool DB_Ctrl::CreateCmdTable()
 {
     QSqlQuery query(db);
     QString create_sql = "create table command ( \
@@ -53,7 +59,25 @@ bool DB_Ctrl::create_cmd_table()
     }
 }
 
-bool DB_Ctrl::add_command(const int &row, const QString &name, const bool &hex, const QString &cmd)
+bool DB_Ctrl::DeleteCmdTable()
+{
+    QSqlQuery query(db);
+    QString sql_exec = "drop table command";
+
+    // Drop a table
+    query.prepare(sql_exec);
+
+    if (!query.exec()) {
+        qDebug() << QObject::tr("Table command drop failed");
+        qDebug() << query.lastError();
+        return false;
+    } else {
+        qDebug() << QObject::tr("Table command drop success.");
+        return true;
+    }
+}
+
+bool DB_Ctrl::InsertCommand(const int &row, const QString &name, const bool &hex, const QString &cmd)
 {
     QSqlQuery query(db);
     QString insert_sql = "INSERT INTO command \
@@ -76,7 +100,7 @@ bool DB_Ctrl::add_command(const int &row, const QString &name, const bool &hex, 
     }
 }
 
-bool DB_Ctrl::update_command(const int &row, const QString &name, const bool &hex, const QString &cmd)
+bool DB_Ctrl::UpdateCommand(const int &row, const QString &name, const bool &hex, const QString &cmd)
 {
     QSqlQuery query(db);
     QString sql = "UPDATE command SET name=:name,hex=:hex,cmd=:cmd WHERE id=:id";
@@ -96,7 +120,7 @@ bool DB_Ctrl::update_command(const int &row, const QString &name, const bool &he
     }
 }
 
-bool DB_Ctrl::read_command(const int &row, QString &name, bool &hex, QString &cmd)
+bool DB_Ctrl::ReadCommand(const int &row, QString &name, bool &hex, QString &cmd)
 {
     QSqlQuery query(db);
     QString sql = "SELECT * FROM command WHERE id=:id";
@@ -119,7 +143,7 @@ bool DB_Ctrl::read_command(const int &row, QString &name, bool &hex, QString &cm
     }
 }
 
-bool DB_Ctrl::delete_command(const int &row)
+bool DB_Ctrl::DeleteCommand(const int &row)
 {
     QSqlQuery query(db);
     QString sql = "DELETE FROM command WHERE id=:id";
@@ -136,7 +160,7 @@ bool DB_Ctrl::delete_command(const int &row)
     }
 }
 
-int DB_Ctrl::get_row_cnt()
+int DB_Ctrl::GetCommandNum()
 {
     QSqlQuery query(db);
     QString sql = "SELECT COUNT(*) FROM command";
@@ -156,7 +180,7 @@ int DB_Ctrl::get_row_cnt()
     return result;
 }
 
-bool DB_Ctrl::clear_table()
+bool DB_Ctrl::DeleteSettingTable()
 {
     QSqlQuery query(db);
     QString sql_exec = "drop table user_setting";
@@ -165,16 +189,35 @@ bool DB_Ctrl::clear_table()
     query.prepare(sql_exec);
 
     if (!query.exec()) {
-        qDebug() << QObject::tr("Table drop failed");
+        qDebug() << QObject::tr("Table user_setting drop failed");
         qDebug() << query.lastError();
         return false;
     } else {
-        qDebug() << QObject::tr("Table drop success.");
+        qDebug() << QObject::tr("Table user_setting drop success.");
         return true;
     }
 }
 
-bool DB_Ctrl::insert_setting(const QString &parameter, const QString &value)
+bool DB_Ctrl::CreateSettingTable()
+{
+    QSqlQuery query(db);
+    QString create_sql = "create table user_setting ( \
+                        id INTEGER primary key AUTOINCREMENT NOT NULL, \
+                        parameter varchar(30), \
+                        value varchar(255), \
+                        update_time varchar(30))";
+    // Create Table
+    query.prepare(create_sql);
+    if (!query.exec()) {
+        qDebug() << QObject::tr("Table Create failed");
+        qDebug() << query.lastError();
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool DB_Ctrl::InsertSetting(const QString &parameter, const QString &value)
 {
     QSqlQuery query(db);
     QString insert_sql = "INSERT INTO user_setting \
@@ -199,7 +242,7 @@ bool DB_Ctrl::insert_setting(const QString &parameter, const QString &value)
     }
 }
 
-bool DB_Ctrl::update_setting(const QString &parameter, const QString &value)
+bool DB_Ctrl::UpdateSetting(const QString &parameter, const QString &value)
 {
     QSqlQuery query(db);
     QString sql = "UPDATE user_setting SET value=:value WHERE parameter=:parameter";
@@ -211,14 +254,14 @@ bool DB_Ctrl::update_setting(const QString &parameter, const QString &value)
     if (!query.exec()) {
         qDebug() << query.lastError();
         // if database has not this parameter, try to insert it.
-        return insert_setting(parameter, value);
+        return InsertSetting(parameter, value);
     } else {
         qDebug() << "Update Parameter Succes : " << parameter << " --> " << value;
         return true;
     }
 }
 
-QString DB_Ctrl::get_setting(const QString &parameter)
+bool DB_Ctrl::ReadSetting(const QString &parameter, QString &value)
 {
     QSqlQuery query(db);
     QString sql = "SELECT * FROM user_setting WHERE parameter=:parameter";
@@ -229,8 +272,8 @@ QString DB_Ctrl::get_setting(const QString &parameter)
 
     if (!query.exec()) {
         qDebug() << query.lastError();
+        return false;
     } else {
-        qDebug() << "Query Parameter Success";
         while (query.next()) {
             QString param = query.value(1).toString();
             QString val = query.value(2).toString();
@@ -238,9 +281,13 @@ QString DB_Ctrl::get_setting(const QString &parameter)
                 result = val;
             }
         }
+        qDebug() << "Queray Parameter : " << parameter << " <-- " << result;
+        value = result;
+        return true;
     }
+}
 
-    qDebug() << "Queray Parameter : " << parameter << " <-- " << result;
-
-    return result;
+void DB_Ctrl::InsertDefaultSetting()
+{
+    InsertSetting("camera_expo", "50");
 }

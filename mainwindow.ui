@@ -38,7 +38,7 @@
        </size>
       </property>
       <property name="text">
-       <string>发送</string>
+       <string>Send</string>
       </property>
      </widget>
     </item>
@@ -65,19 +65,14 @@
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
-     <string>文件</string>
+     <string>File</string>
     </property>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menu_2">
-    <property name="title">
-     <string>编辑</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
-     <string>视图</string>
+     <string>View</string>
     </property>
     <addaction name="separator"/>
     <addaction name="actionLite"/>
@@ -86,18 +81,18 @@
    </widget>
    <widget class="QMenu" name="menu_4">
     <property name="title">
-     <string>工具</string>
+     <string>Tools</string>
     </property>
+    <addaction name="actionCurve"/>
    </widget>
    <widget class="QMenu" name="menu_5">
     <property name="title">
-     <string>帮助</string>
+     <string>Help</string>
     </property>
     <addaction name="actionUpdate"/>
     <addaction name="actionAbout"/>
    </widget>
    <addaction name="menu"/>
-   <addaction name="menu_2"/>
    <addaction name="menu_3"/>
    <addaction name="menu_4"/>
    <addaction name="menu_5"/>
@@ -117,7 +112,7 @@
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget_CmdSend">
    <property name="windowTitle">
-    <string>指令发送</string>
+    <string>Command Send</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -127,35 +122,35 @@
      <item row="2" column="0">
       <widget class="QPushButton" name="pushButton_SaveAllCmd">
        <property name="text">
-        <string>保存</string>
+        <string>Save</string>
        </property>
       </widget>
      </item>
      <item row="1" column="0">
       <widget class="QPushButton" name="pushButton_RemoveCmd">
        <property name="text">
-        <string>删除</string>
+        <string>Delete</string>
        </property>
       </widget>
      </item>
      <item row="0" column="0">
       <widget class="QPushButton" name="pushButton_AddCmd">
        <property name="text">
-        <string>添加</string>
+        <string>Add</string>
        </property>
       </widget>
      </item>
      <item row="3" column="0">
       <widget class="QPushButton" name="pushButton_LoadCmd">
        <property name="text">
-        <string>读取</string>
+        <string>Load</string>
        </property>
       </widget>
      </item>
      <item row="4" column="0">
       <widget class="QPushButton" name="pushButton_SaveAs">
        <property name="text">
-        <string>另存</string>
+        <string>SaveAs</string>
        </property>
       </widget>
      </item>
@@ -167,7 +162,7 @@
   </widget>
   <widget class="QDockWidget" name="dockWidget_Setting">
    <property name="windowTitle">
-    <string>选项</string>
+    <string>Setting</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -196,7 +191,7 @@
         </size>
        </property>
        <property name="title">
-        <string>发送设置</string>
+        <string>Send</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="2" column="1">
@@ -212,21 +207,21 @@
         <item row="0" column="1">
          <widget class="QCheckBox" name="checkBox_SendAsHex">
           <property name="text">
-           <string>十六进制</string>
+           <string>HEX</string>
           </property>
          </widget>
         </item>
         <item row="3" column="1">
          <widget class="QPushButton" name="pushButton_SendClear">
           <property name="text">
-           <string>计数清零</string>
+           <string>Clear</string>
           </property>
          </widget>
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
-           <string>发送计数：</string>
+           <string>Count:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -251,7 +246,7 @@
         </size>
        </property>
        <property name="title">
-        <string>串口设置</string>
+        <string>Serial</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
         <item row="2" column="1">
@@ -266,20 +261,20 @@
         <item row="1" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>波特率</string>
+           <string>Baund:</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
         <item row="5" column="0">
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>流  控</string>
+           <string>FlowCtrl:</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -295,20 +290,20 @@
         <item row="3" column="0">
          <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>停止位</string>
+           <string>StopBit:</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>端  口</string>
+           <string>Port:</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -351,10 +346,10 @@
         <item row="2" column="0">
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>数据位</string>
+           <string>DataLen:</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -370,10 +365,10 @@
         <item row="4" column="0">
          <widget class="QLabel" name="label_5">
           <property name="text">
-           <string>校验位</string>
+           <string>Parity:</string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignCenter</set>
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
@@ -392,7 +387,7 @@
         </size>
        </property>
        <property name="title">
-        <string>接收设置</string>
+        <string>Receive</string>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="3" column="1">
@@ -408,21 +403,21 @@
         <item row="2" column="1">
          <widget class="QCheckBox" name="checkBox_ReceiveShowTime">
           <property name="text">
-           <string>显示时间</string>
+           <string>ShowTime</string>
           </property>
          </widget>
         </item>
         <item row="1" column="1">
          <widget class="QCheckBox" name="checkBox_ReceiveAutoNewLine">
           <property name="text">
-           <string>自动换行</string>
+           <string>NewLine</string>
           </property>
          </widget>
         </item>
         <item row="3" column="0">
          <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>接收计数：</string>
+           <string>Count:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -432,14 +427,14 @@
         <item row="4" column="1">
          <widget class="QPushButton" name="pushButton_ReceiveClear">
           <property name="text">
-           <string>清空接收</string>
+           <string>Clear</string>
           </property>
          </widget>
         </item>
         <item row="1" column="0">
          <widget class="QCheckBox" name="checkBox_ReceiveAsHex">
           <property name="text">
-           <string>十六进制</string>
+           <string>HEX</string>
           </property>
          </widget>
         </item>
@@ -451,7 +446,7 @@
   </widget>
   <widget class="QDockWidget" name="dockWidget_Log">
    <property name="windowTitle">
-    <string>日志</string>
+    <string>Log</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
@@ -467,7 +462,7 @@
         </size>
        </property>
        <property name="text">
-        <string>清空</string>
+        <string>Clear</string>
        </property>
       </widget>
      </item>
@@ -492,7 +487,7 @@
      <normaloff>:/icon/曲线.png</normaloff>:/icon/曲线.png</iconset>
    </property>
    <property name="text">
-    <string>Curve</string>
+    <string>Plotting</string>
    </property>
   </action>
   <action name="actionStart">

@@ -75,6 +75,8 @@ class MainWindow : public QMainWindow
     // Layout Initiailization
     void InitLayout();
 
+    void InitPlotLayout();
+
     // 日志打印
     void LogPrint(const QString msg);
 
@@ -157,12 +159,20 @@ class MainWindow : public QMainWindow
 
     QSerialPort *m_serial;
     DB_Ctrl *db_ctrl;
-    Form_Draw_Curve *form_curve;
-
     QLabel *comStatus;
 
     int receive_cnt;
     int send_cnt;
+
+    // Curve Widget
+    QWidget *widgetCurve;
+    QCustomPlot *m_plot;
+
+    QComboBox *comboBox_SetDataLength;
+    QPushButton *pushButton_UpdateDataLength;
+
+    QPushButton *pushButton_SetLineColor;
+    QLabel *label_LineColorShow;
 };
 
 #endif // MAINWINDOW_H

@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // InitLayout
     InitLayout();
+    InitPlotLayout();
 }
 
 MainWindow::~MainWindow()
@@ -174,7 +175,7 @@ void MainWindow::RefreshCmdTable()
     db_ctrl->open_db();
 
     // Set Table Cnt
-    int row_cnt = db_ctrl->get_row_cnt();
+    int row_cnt = db_ctrl->GetCommandNum();
     ui->tableWidget_SendCmd->setRowCount(row_cnt);
 
     for (int i = 0; i < row_cnt; i++) {
@@ -182,7 +183,7 @@ void MainWindow::RefreshCmdTable()
         QString name;
         bool hex;
         QString cmd;
-        if (db_ctrl->read_command(i, name, hex, cmd)) {
+        if (db_ctrl->ReadCommand(i, name, hex, cmd)) {
             qDebug() << "Read Command:" << i << name << hex << cmd;
 
             // Add a Blank Row
@@ -569,10 +570,10 @@ void MainWindow::on_pushButton_SaveAllCmd_clicked()
 
         qDebug() << "Row Data: " << i << name << hex << cmd;
 
-        bool success = db_ctrl->add_command(i, name, hex, cmd);
+        bool success = db_ctrl->InsertCommand(i, name, hex, cmd);
         if (!success) {
             qDebug() << "Insert failed, trying to update...";
-            success = db_ctrl->update_command(i, name, hex, cmd);
+            success = db_ctrl->UpdateCommand(i, name, hex, cmd);
             qDebug() << success;
         }
     }
@@ -580,11 +581,11 @@ void MainWindow::on_pushButton_SaveAllCmd_clicked()
 
     // delete rows
     db_ctrl->open_db();
-    int db_row_cnt = db_ctrl->get_row_cnt();
+    int db_row_cnt = db_ctrl->GetCommandNum();
     qDebug() << "DB Row Cnt:" << db_row_cnt;
     if (row_cnt < db_row_cnt) {
         for (int i = row_cnt; i < db_row_cnt; i++) {
-            db_ctrl->delete_command(i);
+            db_ctrl->DeleteCommand(i);
         }
     }
     db_ctrl->close_db();
@@ -713,6 +714,78 @@ void MainWindow::InitLayout()
     LiteLayout();
 }
 
+void MainWindow::InitPlotLayout()
+{
+    widgetCurve = new QWidget();
+    widgetCurve->setWindowTitle("Plotting");
+    widgetCurve->resize(640, 480);
+
+    // Plot
+    m_plot = new QCustomPlot(widgetCurve);
+
+    // Maing Group
+    QGroupBox *maingroup = new QGroupBox(widgetCurve);
+    maingroup->setTitle("Setting");
+
+    // Data Length
+    QGroupBox *groupBox_DataLength = new QGroupBox(widgetCurve);
+    groupBox_DataLength->setTitle("Data Length");
+    {
+        // Data Length
+        comboBox_SetDataLength = new QComboBox(widgetCurve);
+        QStringList list;
+        list << "100"
+             << "500"
+             << "1000"
+             << "2000"
+             << "5000"
+             << "10000";
+        comboBox_SetDataLength->addItems(list);
+        comboBox_SetDataLength->setEditable(true);
+        pushButton_UpdateDataLength = new QPushButton(widgetCurve);
+        pushButton_UpdateDataLength->setText("Update");
+
+        // GridLayout
+        QGridLayout *gridlayout = new QGridLayout(groupBox_DataLength);
+        gridlayout->addWidget(comboBox_SetDataLength, 0, 0, 0, 2);
+        gridlayout->addWidget(pushButton_UpdateDataLength, 0, 3, 0, 1);
+    }
+
+    // Curve Color
+    QGroupBox *groupBox_CurveColor = new QGroupBox(widgetCurve);
+    groupBox_CurveColor->setTitle("Color");
+    {
+        QLabel *label = new QLabel(widgetCurve);
+        label->setText("Line:");
+        pushButton_SetLineColor = new QPushButton(widgetCurve);
+        pushButton_SetLineColor->setText("Set");
+
+        label_LineColorShow = new QLabel(widgetCurve);
+        QPalette sample_palette;
+        sample_palette.setColor(QPalette::Window, QColor(125, 125, 125));
+        label_LineColorShow->setPalette(sample_palette);
+        label_LineColorShow->setAutoFillBackground(true);
+
+        QGridLayout *gridlayout = new QGridLayout(groupBox_CurveColor);
+        gridlayout->addWidget(label, 0, 0, 0, 1);
+        gridlayout->addWidget(label_LineColorShow, 0, 1, 0, 1);
+        gridlayout->addWidget(pushButton_SetLineColor, 0, 2, 0, 1);
+    }
+
+    // Setting Gridlayout
+    QGridLayout *gridlayout_Setting = new QGridLayout(maingroup);
+    gridlayout_Setting->addWidget(groupBox_DataLength, 0, 0, 1, 1);
+    gridlayout_Setting->addWidget(groupBox_CurveColor, 1, 0, 1, 1);
+
+    QSpacerItem *verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    gridlayout_Setting->addItem(verticalSpacer, 10, 0, 1, 1);
+
+    // Main Grid
+    QGridLayout *gridlayout_Main = new QGridLayout(widgetCurve);
+    gridlayout_Main->addWidget(m_plot, 0, 0, 0, 4);
+    gridlayout_Main->addWidget(maingroup, 0, 5, 0, 1);
+}
+
 void MainWindow::on_actionResetAll_triggered()
 {
     FullLayout();
@@ -723,4 +796,7 @@ void MainWindow::on_actionLite_triggered()
     LiteLayout();
 }
 
-void MainWindow::on_actionCurve_triggered() {}
+void MainWindow::on_actionCurve_triggered()
+{
+    widgetCurve->show();
+}

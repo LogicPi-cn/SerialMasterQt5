@@ -9,10 +9,7 @@
 #include <QSqlRecord>
 #include <QtSql>
 
-// Crypted or NOT
-//#define CRYPTED
-
-#define DB_NAME "command.db"
+#include "config.h"
 
 class DB_Ctrl
 {
@@ -23,36 +20,23 @@ class DB_Ctrl
     bool open_db();
     void close_db();
 
-    // 创建 Table
-    bool create_cmd_table();
+    // Command Table
+    bool CreateCmdTable();
+    bool DeleteCmdTable();
+    bool InsertCommand(const int &row, const QString &name, const bool &hex, const QString &cmd);
+    bool UpdateCommand(const int &row, const QString &name, const bool &hex, const QString &cmd);
+    bool ReadCommand(const int &row, QString &name, bool &hex, QString &cmd);
+    bool DeleteCommand(const int &row);
+    int GetCommandNum();
 
-    // 插入一条命令
-    bool add_command(const int &row, const QString &name, const bool &hex, const QString &cmd);
-
-    // 更新命令
-    bool update_command(const int &row, const QString &name, const bool &hex, const QString &cmd);
-
-    // 读取一条命令
-    bool read_command(const int &row, QString &name, bool &hex, QString &cmd);
-
-    // 删除一条命令
-    bool delete_command(const int &row);
-
-    // 获取行数
-    int get_row_cnt();
-
-    // Clear Table
-    bool clear_table();
-
-    // insert a setting
-    bool insert_setting(const QString &parameter, const QString &value);
-
-    // update setting
-    bool update_setting(const QString &parameter, const QString &value);
-    // read setting
-    QString get_setting(const QString &parameter);
-    // delete setting
-    bool delete_setting(const QString &parameter);
+    // Setting Table
+    bool DeleteSettingTable();
+    bool CreateSettingTable();
+    bool InsertSetting(const QString &parameter, const QString &value);
+    bool UpdateSetting(const QString &parameter, const QString &value);
+    bool ReadSetting(const QString &parameter, QString &value);
+    bool DeleteSetting(const QString &parameter);
+    void InsertDefaultSetting();
 
   private:
     QSqlDatabase db;
