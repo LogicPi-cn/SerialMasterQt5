@@ -23,9 +23,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     MainWindow::on_pushButton_SendClear_clicked();
     MainWindow::on_pushButton_ReceiveClear_clicked();
 
-    // 默认设置
-    ui->comboBox_BaundRate->setCurrentText("115200");
-
     // 初始化StatusBar
     comStatus = new QLabel("");
     ui->statusBar->addWidget(comStatus);
@@ -46,6 +43,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // InitLayout
     InitLayout();
     InitPlotLayout();
+
+    //
+    LoadSetting();
 }
 
 MainWindow::~MainWindow()
@@ -141,7 +141,74 @@ void MainWindow::LoadSetting()
         rx_end_str = "\n";
     }
 
+    // Rx Setting
+    QString str;
+    if (!db_ctrl->ReadSetting("rx_as_hex", str)) {
+        rx_as_hex = false;
+    } else {
+        if (str == "0") {
+            rx_as_hex = false;
+        } else {
+            rx_as_hex = true;
+        }
+    }
+
+    if (!db_ctrl->ReadSetting("rx_new_line", str)) {
+        rx_new_line = false;
+    } else {
+        if (str == "0") {
+            rx_new_line = false;
+        } else {
+            rx_new_line = true;
+        }
+    }
+
+    if (!db_ctrl->ReadSetting("rx_as_hex", str)) {
+        rx_show_time = false;
+    } else {
+        if (str == "0") {
+            rx_show_time = false;
+        } else {
+            rx_show_time = true;
+        }
+    }
+
+    // Tx Setting
+    if (!db_ctrl->ReadSetting("tx_as_hex", str)) {
+        tx_as_hex = false;
+    } else {
+        if (str == "0") {
+            tx_as_hex = false;
+        } else {
+            tx_as_hex = true;
+        }
+    }
+
+    if (!db_ctrl->ReadSetting("tx_new_line", str)) {
+        tx_new_line = false;
+    } else {
+        if (str == "0") {
+            tx_new_line = false;
+        } else {
+            tx_new_line = true;
+        }
+    }
+
+    // Serial Setting
+    if (!db_ctrl->ReadSetting("baundrate", baundrate)) {
+        baundrate = "115200";
+    }
+
     db_ctrl->CloseDB();
+
+    // Set Ui
+    ui->checkBox_ReceiveAsHex->setChecked(rx_as_hex);
+    ui->checkBox_ReceiveAutoNewLine->setChecked(rx_new_line);
+    ui->checkBox_ReceiveShowTime->setChecked(rx_show_time);
+    ui->checkBox_SendAsHex->setChecked(tx_as_hex);
+    ui->checkBox_SendAutoNewLine->setChecked(tx_new_line);
+
+    ui->comboBox_BaundRate->setCurrentText(baundrate);
 }
 
 void MainWindow::RefreshComList()
@@ -542,11 +609,12 @@ void MainWindow::on_pushButton_Send_clicked()
             send_buf = msg.toLatin1();
         }
 
+        m_serial->write(send_buf);
+
         // Add End String
         if (ui->checkBox_SendAutoNewLine->isChecked()) {
-            send_buf += tx_end_str;
+            m_serial->write(tx_end_str.toLatin1());
         }
-        m_serial->write(send_buf);
 
         // Count
         send_cnt += send_buf.length();
@@ -555,6 +623,8 @@ void MainWindow::on_pushButton_Send_clicked()
         // Log
         QString log = "[Send] " + msg;
         LogPrint(log);
+
+        qDebug() << "Send:" << msg;
     } else {
         qDebug() << "Serial Port is not opened.";
         comStatus->setStyleSheet(("color:red"));
@@ -918,4 +988,71 @@ void MainWindow::on_actionLoadDefault_triggered()
         // Close Main Window
         this->close();
     }
+}
+
+void MainWindow::on_checkBox_ReceiveAsHex_toggled(bool checked)
+{
+    rx_as_hex = checked;
+    db_ctrl->OpenDB();
+    if (checked) {
+        db_ctrl->UpdateSetting("rx_as_hex", "1");
+    } else {
+        db_ctrl->UpdateSetting("rx_as_hex", "0");
+    }
+    db_ctrl->CloseDB();
+}
+
+void MainWindow::on_checkBox_ReceiveAutoNewLine_toggled(bool checked)
+{
+    rx_new_line = checked;
+    db_ctrl->OpenDB();
+    if (checked) {
+        db_ctrl->UpdateSetting("rx_new_line", "1");
+    } else {
+        db_ctrl->UpdateSetting("rx_new_line", "0");
+    }
+    db_ctrl->CloseDB();
+}
+
+void MainWindow::on_checkBox_ReceiveShowTime_toggled(bool checked)
+{
+    rx_show_time = checked;
+    db_ctrl->OpenDB();
+    if (checked) {
+        db_ctrl->UpdateSetting("rx_show_time", "1");
+    } else {
+        db_ctrl->UpdateSetting("rx_show_time", "0");
+    }
+    db_ctrl->CloseDB();
+}
+
+void MainWindow::on_checkBox_SendAsHex_toggled(bool checked)
+{
+    tx_as_hex = checked;
+    db_ctrl->OpenDB();
+    if (checked) {
+        db_ctrl->UpdateSetting("tx_as_hex", "1");
+    } else {
+        db_ctrl->UpdateSetting("tx_as_hex", "0");
+    }
+    db_ctrl->CloseDB();
+}
+
+void MainWindow::on_checkBox_SendAutoNewLine_toggled(bool checked)
+{
+    tx_new_line = checked;
+    db_ctrl->OpenDB();
+    if (checked) {
+        db_ctrl->UpdateSetting("tx_new_line", "1");
+    } else {
+        db_ctrl->UpdateSetting("tx_new_line", "0");
+    }
+    db_ctrl->CloseDB();
+}
+
+void MainWindow::on_comboBox_BaundRate_currentTextChanged(const QString &arg1)
+{
+    db_ctrl->OpenDB();
+    db_ctrl->UpdateSetting("baundrate", arg1);
+    db_ctrl->CloseDB();
 }

@@ -163,6 +163,18 @@ class MainWindow : public QMainWindow
 
     void on_actionLoadDefault_triggered();
 
+    void on_checkBox_ReceiveAsHex_toggled(bool checked);
+
+    void on_checkBox_ReceiveAutoNewLine_toggled(bool checked);
+
+    void on_checkBox_ReceiveShowTime_toggled(bool checked);
+
+    void on_checkBox_SendAsHex_toggled(bool checked);
+
+    void on_checkBox_SendAutoNewLine_toggled(bool checked);
+
+    void on_comboBox_BaundRate_currentTextChanged(const QString &arg1);
+
   private:
     Ui::MainWindow *ui;
 
@@ -173,14 +185,23 @@ class MainWindow : public QMainWindow
     int receive_cnt;
     int send_cnt;
 
-    // End String , \n or \r or \n\r or \r\n
+    // End String
     QString tx_end_str;
     QString rx_end_str;
+
+    bool rx_as_hex;
+    bool rx_new_line;
+    bool rx_show_time;
+
+    bool tx_as_hex;
+    bool tx_new_line;
 
     // Line Color
     int line_color_r;
     int line_color_g;
     int line_color_b;
+
+    QString baundrate;
 
     // Send Loop
     QThread *m_pThread;

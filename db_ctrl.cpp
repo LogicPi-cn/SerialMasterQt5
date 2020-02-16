@@ -293,10 +293,19 @@ void DB_Ctrl::InsertDefaultSetting()
     InsertSetting("mode", "0"); // 0-> Lite, 1->Full;
 
     // Plotting->LineColor
-    InsertSetting("line_colr_r", "0");
-    InsertSetting("line_colr_g", "0");
-    InsertSetting("line_colr_b", "255");
+    InsertSetting("line_color_r", "0");
+    InsertSetting("line_color_g", "0");
+    InsertSetting("line_color_b", "255");
 
     InsertSetting("tx_end_str", "\n"); // End String
     InsertSetting("rx_end_str", "\n"); // End String
+
+    InsertSetting("rx_as_hex", "0");
+    InsertSetting("rx_new_line", "0");
+    InsertSetting("rx_show_time", "0");
+
+    InsertSetting("tx_as_hex", "0");
+    InsertSetting("tx_new_line", "0");
+
+    InsertSetting("baundrate", "115200");
 }
