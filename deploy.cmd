@@ -1,7 +1,7 @@
 @echo off
 
 REM win deploy 工具
-set deploy=D:\Qt\Qt5.12.6\5.12.6\msvc2017\bin\windeployqt.exe
+set deploy=D:\Qt\5.12.7\msvc2017\bin\windeployqt.exe
 
 REM 源文件
 set source_exe_path=release\SerialMaster.exe
