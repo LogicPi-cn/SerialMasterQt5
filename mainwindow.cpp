@@ -599,7 +599,7 @@ void MainWindow::on_pushButton_LoadCmd_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, ("Open Setting"), "", tr("DB Files (*.db)"), nullptr);
     if (!fileName.isNull()) {
-        QString dst = QCoreApplication::applicationDirPath() + "/" + db_ctrl->dbName;
+        QString dst = QCoreApplication::applicationDirPath() + "/" + DB_NAME;
         qDebug() << "Dst :" << dst;
         if (!QFile::copy(fileName, dst)) {
             QMessageBox::warning(nullptr, "Failed!", "Load Failed!");
@@ -618,7 +618,7 @@ void MainWindow::on_pushButton_SaveAs_clicked()
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Setting"), filename_ba, tr("DB Files (*.db)"));
 
     if (!fileName.isNull()) {
-        if (!QFile::copy(db_ctrl->dbName, fileName)) {
+        if (!QFile::copy(DB_NAME, fileName)) {
             QMessageBox::warning(nullptr, "Failed!", "Save Failed!");
         } else {
             QMessageBox::information(nullptr, "Success!", "Save success.");
@@ -722,3 +722,5 @@ void MainWindow::on_actionLite_triggered()
 {
     LiteLayout();
 }
+
+void MainWindow::on_actionCurve_triggered() {}

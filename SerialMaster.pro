@@ -4,13 +4,13 @@
 #
 #-------------------------------------------------
 
-QT       += core gui serialport sql network
+QT       += core gui sql charts serialport network datavisualization qml quick
 
 QMAKE_LFLAGS += /NODEFAULTLIB:LIBCMTD
 
 RC_ICONS = icon\serial.ico
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = SerialMaster
 TEMPLATE = app
@@ -33,17 +33,24 @@ CONFIG += c++11
 SOURCES += \
         db_ctrl.cpp \
         form_about.cpp \
+        form_draw_curve.cpp \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        qaesencryption.cpp \
+        qcustomplot.cpp
 
 HEADERS += \
         config.h \
         db_ctrl.h \
         form_about.h \
-        mainwindow.h
+        form_draw_curve.h \
+        mainwindow.h \
+        qaesencryption.h \
+        qcustomplot.h
 
 FORMS += \
         form_about.ui \
+        form_draw_curve.ui \
         mainwindow.ui
 
 # Default rules for deployment.

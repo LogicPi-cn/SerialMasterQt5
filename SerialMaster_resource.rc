@@ -1,6 +1,6 @@
 #include <windows.h>
 
-IDI_ICON1	ICON	DISCARDABLE	"E:\\06LogicPi\\04-Git_Projects\\SerialMaster_qt\\icon\\serial.ico"
+IDI_ICON1	ICON	DISCARDABLE	"E:\\06LogicPi\\04-Proj_Qt\\SerialMaster_qt\\icon\\serial.ico"
 
 VS_VERSION_INFO VERSIONINFO
 	FILEVERSION 0,0,0,0

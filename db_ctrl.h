@@ -12,6 +12,8 @@
 // Crypted or NOT
 //#define CRYPTED
 
+#define DB_NAME "command.db"
+
 class DB_Ctrl
 {
   public:
@@ -51,8 +53,6 @@ class DB_Ctrl
     QString get_setting(const QString &parameter);
     // delete setting
     bool delete_setting(const QString &parameter);
-
-    const QString dbName = "command.db";
 
   private:
     QSqlDatabase db;

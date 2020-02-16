@@ -26,13 +26,14 @@
 
 #include <devguid.h>
 
-#include <SetupAPI.h>
-
 #include <InitGuid.h>
+#include <SetupAPI.h>
 
 #include "config.h"
 #include "db_ctrl.h"
 #include "form_about.h"
+#include "form_draw_curve.h"
+#include "qcustomplot.h"
 
 static const GUID GUID_DEVINTERFACE_LIST[] = {
     // CSC板卡
@@ -149,15 +150,16 @@ class MainWindow : public QMainWindow
 
     void on_actionLite_triggered();
 
+    void on_actionCurve_triggered();
+
   private:
     Ui::MainWindow *ui;
 
     QSerialPort *m_serial;
     DB_Ctrl *db_ctrl;
+    Form_Draw_Curve *form_curve;
 
     QLabel *comStatus;
-    QLabel *RX_Label;
-    QLabel *TX_Label;
 
     int receive_cnt;
     int send_cnt;

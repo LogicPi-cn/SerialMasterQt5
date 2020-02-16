@@ -4,11 +4,11 @@ DB_Ctrl::DB_Ctrl() {}
 
 bool DB_Ctrl::open_db()
 {
-    if (QSqlDatabase::contains(dbName)) {
-        db = QSqlDatabase::database(dbName);
+    if (QSqlDatabase::contains(DB_NAME)) {
+        db = QSqlDatabase::database(DB_NAME);
     } else {
-        db = QSqlDatabase::addDatabase("QSQLITE", dbName);
-        db.setDatabaseName(dbName);
+        db = QSqlDatabase::addDatabase("QSQLITE", DB_NAME);
+        db.setDatabaseName(DB_NAME);
         if (db.open()) {
             if (create_cmd_table()) {
                 qDebug() << "Create Table Success";
@@ -18,7 +18,7 @@ bool DB_Ctrl::open_db()
         }
     }
 
-    db.setDatabaseName(dbName);
+    db.setDatabaseName(DB_NAME);
 
     if (!db.open()) {
         qDebug() << "Database Error!";
