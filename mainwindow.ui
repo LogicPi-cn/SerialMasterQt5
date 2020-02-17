@@ -216,7 +216,7 @@
         <item row="3" column="0">
          <widget class="QLabel" name="label_SendCnt">
           <property name="frameShape">
-           <enum>QFrame::Box</enum>
+           <enum>QFrame::Panel</enum>
           </property>
           <property name="text">
            <string/>
@@ -419,7 +419,7 @@
         <item row="5" column="0">
          <widget class="QLabel" name="label_ReceiveCnt">
           <property name="frameShape">
-           <enum>QFrame::Box</enum>
+           <enum>QFrame::Panel</enum>
           </property>
           <property name="text">
            <string/>
@@ -564,7 +564,7 @@
      <normaloff>:/icon/load.png</normaloff>:/icon/load.png</iconset>
    </property>
    <property name="text">
-    <string>LoadSetting</string>
+    <string>LoadSetting...</string>
    </property>
    <property name="toolTip">
     <string>LoadSetting</string>
@@ -576,7 +576,7 @@
      <normaloff>:/icon/saveas.png</normaloff>:/icon/saveas.png</iconset>
    </property>
    <property name="text">
-    <string>SaveSetting</string>
+    <string>SaveAs...</string>
    </property>
   </action>
   <action name="actionLoadDefault">

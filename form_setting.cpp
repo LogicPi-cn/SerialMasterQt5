@@ -16,14 +16,14 @@ Form_Setting::~Form_Setting()
 
 void Form_Setting::LoadSetting()
 {
-    m_dbCtrl->OpenDB();
-    if (!m_dbCtrl->ReadSetting("tx_end_str", tx_end_str)) {
+    m_dbCtrl->openDB();
+    if (!m_dbCtrl->getSetting("tx_end_str", tx_end_str)) {
         tx_end_str = "\n";
     }
-    if (!m_dbCtrl->ReadSetting("rx_end_str", rx_end_str)) {
+    if (!m_dbCtrl->getSetting("rx_end_str", rx_end_str)) {
         rx_end_str = "\n";
     }
-    m_dbCtrl->CloseDB();
+    m_dbCtrl->closeDB();
 
     if (tx_end_str == "") {
         ui->comboBox_TxEndStr->setCurrentIndex(0);
@@ -73,9 +73,9 @@ void Form_Setting::on_comboBox_TxEndStr_currentIndexChanged(int index)
         break;
     }
 
-    m_dbCtrl->OpenDB();
-    m_dbCtrl->UpdateSetting("tx_end_str", tx_end_str);
-    m_dbCtrl->CloseDB();
+    m_dbCtrl->openDB();
+    m_dbCtrl->updateSetting("tx_end_str", tx_end_str);
+    m_dbCtrl->closeDB();
 }
 
 void Form_Setting::on_comboBox_RxEndStr_currentIndexChanged(int index)
@@ -101,7 +101,7 @@ void Form_Setting::on_comboBox_RxEndStr_currentIndexChanged(int index)
         break;
     }
 
-    m_dbCtrl->OpenDB();
-    m_dbCtrl->UpdateSetting("rx_end_str", rx_end_str);
-    m_dbCtrl->CloseDB();
+    m_dbCtrl->openDB();
+    m_dbCtrl->updateSetting("rx_end_str", rx_end_str);
+    m_dbCtrl->closeDB();
 }

@@ -33,7 +33,6 @@ CONFIG += c++11
 SOURCES += \
         db_ctrl.cpp \
         form_about.cpp \
-        form_draw_curve.cpp \
         form_setting.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -44,7 +43,6 @@ HEADERS += \
         config.h \
         db_ctrl.h \
         form_about.h \
-        form_draw_curve.h \
         form_setting.h \
         mainwindow.h \
         qaesencryption.h \
@@ -52,7 +50,6 @@ HEADERS += \
 
 FORMS += \
         form_about.ui \
-        form_draw_curve.ui \
         form_setting.ui \
         mainwindow.ui
 

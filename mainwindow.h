@@ -18,35 +18,30 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
-#include <locale>
-
 #include <Windows.h>
-
+// these Headers must be included after windwows.h
 #include <Dbt.h>
-
-#include <devguid.h>
-
 #include <InitGuid.h>
 #include <SetupAPI.h>
+#include <devguid.h>
 
 #include "config.h"
 #include "db_ctrl.h"
 #include "form_about.h"
-#include "form_draw_curve.h"
 #include "form_setting.h"
 #include "qcustomplot.h"
 
 static const GUID GUID_DEVINTERFACE_LIST[] = {
     // CSC板卡
-    {0x4e4f17d3, 0xf4c1, 0x468d, {0x9d, 0xc2, 0x74, 0xdb, 0x5b, 0x56, 0x97, 0x59}},
+    //    {0x4e4f17d3, 0xf4c1, 0x468d, {0x9d, 0xc2, 0x74, 0xdb, 0x5b, 0x56, 0x97, 0x59}},
     //   GUID_DEVINTERFACE_USB_DEVICE
     {0xA5DCBF10, 0x6530, 0x11D2, {0x90, 0x1F, 0x00, 0xC0, 0x4F, 0xB9, 0x51, 0xED}},
     // GUID_DEVINTERFACE_DISK
-    {0x53f56307, 0xb6bf, 0x11d0, {0x94, 0xf2, 0x00, 0xa0, 0xc9, 0x1e, 0xfb, 0x8b}},
+    //    {0x53f56307, 0xb6bf, 0x11d0, {0x94, 0xf2, 0x00, 0xa0, 0xc9, 0x1e, 0xfb, 0x8b}},
     // GUID_DEVINTERFACE_HID,
-    {0x4D1E55B2, 0xF16F, 0x11CF, {0x88, 0xCB, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30}},
+    //    {0x4D1E55B2, 0xF16F, 0x11CF, {0x88, 0xCB, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30}},
     // GUID_NDIS_LAN_CLASS
-    {0xad498944, 0x762f, 0x11d0, {0x8d, 0xcb, 0x00, 0xc0, 0x4f, 0xc3, 0x35, 0x8c}}
+    //    {0xad498944, 0x762f, 0x11d0, {0x8d, 0xcb, 0x00, 0xc0, 0x4f, 0xc3, 0x35, 0x8c}}
     //// GUID_DEVINTERFACE_COMPORT
     //{ 0x86e0d1e0, 0x8089, 0x11d0, { 0x9c, 0xe4, 0x08, 0x00, 0x3e, 0x30, 0x1f, 0x73 } },
     //// GUID_DEVINTERFACE_SERENUM_BUS_ENUMERATOR
@@ -139,10 +134,6 @@ class MainWindow : public QMainWindow
 
     void on_pushButton_SaveAllCmd_clicked();
 
-    void on_pushButton_LoadCmd_clicked();
-
-    void on_pushButton_SaveAs_clicked();
-
     void on_pushButton_ClearLog_clicked();
 
     void on_actionAbout_triggered();
@@ -175,9 +166,14 @@ class MainWindow : public QMainWindow
 
     void on_comboBox_BaundRate_currentTextChanged(const QString &arg1);
 
+    void on_actionLoadSetting_triggered();
+
+    void on_actionSaveSetting_triggered();
+
   private:
     Ui::MainWindow *ui;
 
+    // Global
     QSerialPort *m_serial;
     DB_Ctrl *db_ctrl;
     QLabel *comStatus;
@@ -216,6 +212,9 @@ class MainWindow : public QMainWindow
 
     QPushButton *pushButton_SetLineColor;
     QLabel *label_LineColorShow;
+
+    QComboBox *comboBox_DataStopBit;
+    QLineEdit *lineEdit_DataStopCustom;
 };
 
 #endif // MAINWINDOW_H

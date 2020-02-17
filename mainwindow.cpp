@@ -8,44 +8,42 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     QString title = QString("SerialMaster ") + (VERSION);
     setWindowTitle(title);
 
-    // 串口句柄
+    // Serial Handler
     m_serial = new QSerialPort();
-    // 数据库操作
+    // Database
     db_ctrl = new DB_Ctrl();
 
-    // 注册热插拔检测事件
+    // Hot Plog Register
     RegHandler();
 
-    // 刷新串口
+    // Refersh Com List
     RefreshComList();
 
-    // 清空计数器
-    MainWindow::on_pushButton_SendClear_clicked();
-    MainWindow::on_pushButton_ReceiveClear_clicked();
-
-    // 初始化StatusBar
+    // StatusBar
     comStatus = new QLabel("");
     ui->statusBar->addWidget(comStatus);
 
-    // 初始化命令Table
+    // Command Table
     InitCmdTable();
 
     ui->actionStart->setDisabled(false);
     ui->actionStop->setDisabled(true);
 
-    // 计数器清零
+    // Clear Count
+    MainWindow::on_pushButton_SendClear_clicked();
+    MainWindow::on_pushButton_ReceiveClear_clicked();
     receive_cnt = 0;
     send_cnt = 0;
-
-    // 检查更新
-    CheckUpdate();
 
     // InitLayout
     InitLayout();
     InitPlotLayout();
 
-    //
+    // Load Setting from Database
     LoadSetting();
+
+    // Check Update
+    CheckUpdate();
 }
 
 MainWindow::~MainWindow()
@@ -113,37 +111,37 @@ void MainWindow::StringToHex(QString str, QByteArray &senddata)
 
 void MainWindow::LoadSetting()
 {
-    db_ctrl->OpenDB();
+    db_ctrl->openDB();
 
     // Line Color
     QString r, g, b;
-    if (!db_ctrl->ReadSetting("line_color_r", r)) {
+    if (!db_ctrl->getSetting("line_color_r", r)) {
         line_color_r = 0;
     } else {
         line_color_r = r.toInt();
     }
-    if (!db_ctrl->ReadSetting("line_color_g", g)) {
+    if (!db_ctrl->getSetting("line_color_g", g)) {
         line_color_g = 0;
     } else {
         line_color_g = g.toInt();
     }
-    if (!db_ctrl->ReadSetting("line_color_b", b)) {
+    if (!db_ctrl->getSetting("line_color_b", b)) {
         line_color_b = 255;
     } else {
         line_color_b = b.toInt();
     }
 
     // End String
-    if (!db_ctrl->ReadSetting("tx_end_str", tx_end_str)) {
+    if (!db_ctrl->getSetting("tx_end_str", tx_end_str)) {
         tx_end_str = "\n";
     }
-    if (!db_ctrl->ReadSetting("rx_end_str", rx_end_str)) {
+    if (!db_ctrl->getSetting("rx_end_str", rx_end_str)) {
         rx_end_str = "\n";
     }
 
     // Rx Setting
     QString str;
-    if (!db_ctrl->ReadSetting("rx_as_hex", str)) {
+    if (!db_ctrl->getSetting("rx_as_hex", str)) {
         rx_as_hex = false;
     } else {
         if (str == "0") {
@@ -153,7 +151,7 @@ void MainWindow::LoadSetting()
         }
     }
 
-    if (!db_ctrl->ReadSetting("rx_new_line", str)) {
+    if (!db_ctrl->getSetting("rx_new_line", str)) {
         rx_new_line = false;
     } else {
         if (str == "0") {
@@ -163,7 +161,7 @@ void MainWindow::LoadSetting()
         }
     }
 
-    if (!db_ctrl->ReadSetting("rx_as_hex", str)) {
+    if (!db_ctrl->getSetting("rx_as_hex", str)) {
         rx_show_time = false;
     } else {
         if (str == "0") {
@@ -174,7 +172,7 @@ void MainWindow::LoadSetting()
     }
 
     // Tx Setting
-    if (!db_ctrl->ReadSetting("tx_as_hex", str)) {
+    if (!db_ctrl->getSetting("tx_as_hex", str)) {
         tx_as_hex = false;
     } else {
         if (str == "0") {
@@ -184,7 +182,7 @@ void MainWindow::LoadSetting()
         }
     }
 
-    if (!db_ctrl->ReadSetting("tx_new_line", str)) {
+    if (!db_ctrl->getSetting("tx_new_line", str)) {
         tx_new_line = false;
     } else {
         if (str == "0") {
@@ -195,11 +193,11 @@ void MainWindow::LoadSetting()
     }
 
     // Serial Setting
-    if (!db_ctrl->ReadSetting("baundrate", baundrate)) {
+    if (!db_ctrl->getSetting("baundrate", baundrate)) {
         baundrate = "115200";
     }
 
-    db_ctrl->CloseDB();
+    db_ctrl->closeDB();
 
     // Set Ui
     ui->checkBox_ReceiveAsHex->setChecked(rx_as_hex);
@@ -272,10 +270,10 @@ void MainWindow::AddEmptyRowInCommandTable(const int &row, const bool &hex)
 void MainWindow::RefreshCmdTable()
 {
     // Open DB
-    db_ctrl->OpenDB();
+    db_ctrl->openDB();
 
     // Set Table Cnt
-    int row_cnt = db_ctrl->GetCommandNum();
+    int row_cnt = db_ctrl->getCommandNum();
     ui->tableWidget_SendCmd->setRowCount(row_cnt);
 
     for (int i = 0; i < row_cnt; i++) {
@@ -283,7 +281,7 @@ void MainWindow::RefreshCmdTable()
         QString name;
         bool hex;
         QString cmd;
-        if (db_ctrl->ReadCommand(i, name, hex, cmd)) {
+        if (db_ctrl->getCommand(i, name, hex, cmd)) {
             qDebug() << "Read Command:" << i << name << hex << cmd;
 
             // Add a Blank Row
@@ -299,7 +297,7 @@ void MainWindow::RefreshCmdTable()
     }
 
     // Close DB
-    db_ctrl->CloseDB();
+    db_ctrl->closeDB();
 }
 
 void MainWindow::SendTableCommand(const int &row)
@@ -397,8 +395,9 @@ void MainWindow::RegHandler()
     NotifacationFiler.dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
     NotifacationFiler.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
 
+    // Register
     for (int i = 0; i < sizeof(GUID_DEVINTERFACE_LIST) / sizeof(GUID); i++) {
-        NotifacationFiler.dbcc_classguid = GUID_DEVINTERFACE_LIST[i]; // GetCurrentUSBGUID();//m_usb->GetDriverGUID();
+        NotifacationFiler.dbcc_classguid = GUID_DEVINTERFACE_LIST[i]; //
         hDevNotify = RegisterDeviceNotification((HANDLE)this->winId(), &NotifacationFiler, DEVICE_NOTIFY_WINDOW_HANDLE);
         if (!hDevNotify) {
             int Err = GetLastError();
@@ -412,51 +411,24 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
     MSG *msg = reinterpret_cast<MSG *>(message);
     int msgType = msg->message;
     if (msgType == WM_DEVICECHANGE) {
-        // qDebug() << "Event DEVICECHANGE Happend" << endl;
         PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)msg->lParam;
-        PDEV_BROADCAST_DEVICEINTERFACE b;
         switch (msg->wParam) {
         case DBT_DEVICEARRIVAL:
-            b = (PDEV_BROADCAST_DEVICEINTERFACE)msg->lParam;
-            if (b->dbcc_classguid == GUID_DEVINTERFACE_LIST[0]) {
-                //检测到注册的GUID dosomething
-                qDebug() << "CSC Insert";
-            }
-            if (lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME) {
-                PDEV_BROADCAST_VOLUME lpdbv = (PDEV_BROADCAST_VOLUME)lpdb;
-                if (lpdbv->dbcv_flags == 0) {
-                    //插入u盘
-                    QString USBDisk = QString(this->FirstDriveFromMask(lpdbv->dbcv_unitmask));
-                    qDebug() << "USB_Arrived and The USBDisk is: " << USBDisk;
-                }
-            }
             if (lpdb->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
                 PDEV_BROADCAST_DEVICEINTERFACE pDevInf = (PDEV_BROADCAST_DEVICEINTERFACE)lpdb;
-
                 QString strname = QString::fromWCharArray(pDevInf->dbcc_name, pDevInf->dbcc_size);
+                // Refresh
                 qDebug() << "Device Insert";
                 RefreshComList();
-                // ui->textBrowser->append("插入设备 ：" + strname);
             }
             break;
         case DBT_DEVICEREMOVECOMPLETE:
-            b = (PDEV_BROADCAST_DEVICEINTERFACE)msg->lParam;
-            if (b->dbcc_classguid == GUID_DEVINTERFACE_LIST[0]) {
-                //检测到注册的GUID dosomething
-                qDebug() << "CSC Removed";
-            }
-            if (lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME) {
-                PDEV_BROADCAST_VOLUME lpdbv = (PDEV_BROADCAST_VOLUME)lpdb;
-                if (lpdbv->dbcv_flags == 0) {
-                }
-            }
             if (lpdb->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE) {
                 PDEV_BROADCAST_DEVICEINTERFACE pDevInf = (PDEV_BROADCAST_DEVICEINTERFACE)lpdb;
-
+                QString strname = QString::fromWCharArray(pDevInf->dbcc_name, pDevInf->dbcc_size);
+                // Refresh
                 qDebug() << "Device Removed";
                 RefreshComList();
-
-                QString strname = QString::fromWCharArray(pDevInf->dbcc_name, pDevInf->dbcc_size);
             }
             break;
         }
@@ -666,7 +638,7 @@ void MainWindow::on_pushButton_SaveAllCmd_clicked()
     qDebug() << "Table Row Cnt:" << row_cnt;
 
     // Save
-    db_ctrl->OpenDB();
+    db_ctrl->openDB();
     for (int i = 0; i < row_cnt; i++) {
         // check if Blank
         QString name = "";
@@ -694,61 +666,30 @@ void MainWindow::on_pushButton_SaveAllCmd_clicked()
 
         qDebug() << "Row Data: " << i << name << hex << cmd;
 
-        bool success = db_ctrl->InsertCommand(i, name, hex, cmd);
+        bool success = db_ctrl->insertCommand(i, name, hex, cmd);
         if (!success) {
             qDebug() << "Insert failed, trying to update...";
-            success = db_ctrl->UpdateCommand(i, name, hex, cmd);
+            success = db_ctrl->updateCommand(i, name, hex, cmd);
             qDebug() << success;
         }
     }
-    db_ctrl->CloseDB();
+    db_ctrl->closeDB();
 
     // delete rows
-    db_ctrl->OpenDB();
-    int db_row_cnt = db_ctrl->GetCommandNum();
+    db_ctrl->openDB();
+    int db_row_cnt = db_ctrl->getCommandNum();
     qDebug() << "DB Row Cnt:" << db_row_cnt;
     if (row_cnt < db_row_cnt) {
         for (int i = row_cnt; i < db_row_cnt; i++) {
-            db_ctrl->DeleteCommand(i);
+            db_ctrl->deleteCommand(i);
         }
     }
-    db_ctrl->CloseDB();
+    db_ctrl->closeDB();
 
     QMessageBox::information(nullptr, "Saved!", "Saved success.");
 
     // Refresh
     RefreshCmdTable();
-}
-
-void MainWindow::on_pushButton_LoadCmd_clicked()
-{
-    QString fileName = QFileDialog::getOpenFileName(this, ("Open Setting"), "", tr("DB Files (*.db)"), nullptr);
-    if (!fileName.isNull()) {
-        QString dst = QCoreApplication::applicationDirPath() + "/" + DB_NAME;
-        qDebug() << "Dst :" << dst;
-        if (!QFile::copy(fileName, dst)) {
-            QMessageBox::warning(nullptr, "Failed!", "Load Failed!");
-        } else {
-            QMessageBox::information(nullptr, "Success!", "Load success.");
-        }
-    }
-}
-
-void MainWindow::on_pushButton_SaveAs_clicked()
-{
-    QDateTime time = QDateTime::currentDateTime();
-    QString fileName_str = time.toString("yyyy-MM-dd----hh-mm-ss");
-    QByteArray filename_ba = fileName_str.toLatin1();
-
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Setting"), filename_ba, tr("DB Files (*.db)"));
-
-    if (!fileName.isNull()) {
-        if (!QFile::copy(DB_NAME, fileName)) {
-            QMessageBox::warning(nullptr, "Failed!", "Save Failed!");
-        } else {
-            QMessageBox::information(nullptr, "Success!", "Save success.");
-        }
-    }
 }
 
 void MainWindow::on_pushButton_ClearLog_clicked()
@@ -846,6 +787,7 @@ void MainWindow::InitPlotLayout()
 
     // Plot
     m_plot = new QCustomPlot(widgetCurve);
+    m_plot->setMinimumSize(320, 320);
 
     // Data Length
     QGroupBox *groupBox_DataLength = new QGroupBox(widgetCurve);
@@ -892,31 +834,43 @@ void MainWindow::InitPlotLayout()
         gridlayout->addWidget(pushButton_SetLineColor, 0, 2, 0, 1);
     }
 
-    // Setting Docker
-    //    QWidget *dock_Contnent = new QWidget();
-    //    dock_Contnent->setObjectName(QString::fromUtf8("dock_Contnent"));
+    // Data Stop Bit
+    QGroupBox *groupBox_DataStop = new QGroupBox(widgetCurve);
+    groupBox_DataStop->setTitle("Data Stop");
+    {
+        comboBox_DataStopBit = new QComboBox(widgetCurve);
+        QStringList list;
+        list << "Space"
+             << "Comma"
+             << "Enter"
+             << "Custom";
+        comboBox_DataStopBit->addItems(list);
 
-    //    QDockWidget *settingWidget = new QDockWidget(this);
-    //    settingWidget->setObjectName(QString::fromUtf8("dockWidgetPlotTool"));
-    //    settingWidget->setWindowTitle(QApplication::translate("this", "Plot Setting", nullptr));
-    //    settingWidget->setWidget(dock_Contnent);
-    //    settingWidget->setMaximumWidth(200);
+        lineEdit_DataStopCustom = new QLineEdit(widgetCurve);
+        lineEdit_DataStopCustom->setAlignment(Qt::AlignCenter);
+
+        QGridLayout *gridlayout = new QGridLayout(groupBox_DataStop);
+        gridlayout->addWidget(comboBox_DataStopBit, 0, 0, 0, 1);
+        gridlayout->addWidget(lineEdit_DataStopCustom, 0, 1, 0, 1);
+    }
 
     QGroupBox *settingGroup = new QGroupBox(widgetCurve);
     settingGroup->setTitle("Setting");
+    settingGroup->setMaximumWidth(200);
 
     // Grid for Setting
     QGridLayout *gridlayout_Setting = new QGridLayout(settingGroup);
     gridlayout_Setting->addWidget(groupBox_DataLength, 0, 0, 1, 1);
     gridlayout_Setting->addWidget(groupBox_CurveColor, 1, 0, 1, 1);
+    gridlayout_Setting->addWidget(groupBox_DataStop, 2, 0, 1, 1);
 
     QSpacerItem *verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    gridlayout_Setting->addItem(verticalSpacer, 10, 0, 1, 1);
+    gridlayout_Setting->addItem(verticalSpacer, 5, 0, 1, 1);
 
     // Main Grid
     QGridLayout *gridlayout_Main = new QGridLayout(widgetCurve);
-    gridlayout_Main->addWidget(m_plot, 0, 0, 1, 4);
-    gridlayout_Main->addWidget(settingGroup, 0, 5, 1, 1);
+    gridlayout_Main->addWidget(m_plot, 0, 0, 0, 4);
+    gridlayout_Main->addWidget(settingGroup, 0, 5, 0, 1);
 }
 
 void MainWindow::on_actionLite_triggered()
@@ -980,9 +934,9 @@ void MainWindow::on_actionLoadDefault_triggered()
                              QMessageBox::Yes | QMessageBox::No,
                              QMessageBox::No);
     if (rb == QMessageBox::Yes) {
-        db_ctrl->OpenDB();
-        db_ctrl->DeleteSettingTable();
-        db_ctrl->CloseDB();
+        db_ctrl->openDB();
+        db_ctrl->deleteSettingTable();
+        db_ctrl->closeDB();
 
         QMessageBox::warning(nullptr, "Notice!", "Please restart the software!");
         // Close Main Window
@@ -993,66 +947,97 @@ void MainWindow::on_actionLoadDefault_triggered()
 void MainWindow::on_checkBox_ReceiveAsHex_toggled(bool checked)
 {
     rx_as_hex = checked;
-    db_ctrl->OpenDB();
+    db_ctrl->openDB();
     if (checked) {
-        db_ctrl->UpdateSetting("rx_as_hex", "1");
+        db_ctrl->updateSetting("rx_as_hex", "1");
     } else {
-        db_ctrl->UpdateSetting("rx_as_hex", "0");
+        db_ctrl->updateSetting("rx_as_hex", "0");
     }
-    db_ctrl->CloseDB();
+    db_ctrl->closeDB();
 }
 
 void MainWindow::on_checkBox_ReceiveAutoNewLine_toggled(bool checked)
 {
     rx_new_line = checked;
-    db_ctrl->OpenDB();
+    db_ctrl->openDB();
     if (checked) {
-        db_ctrl->UpdateSetting("rx_new_line", "1");
+        db_ctrl->updateSetting("rx_new_line", "1");
     } else {
-        db_ctrl->UpdateSetting("rx_new_line", "0");
+        db_ctrl->updateSetting("rx_new_line", "0");
     }
-    db_ctrl->CloseDB();
+    db_ctrl->closeDB();
 }
 
 void MainWindow::on_checkBox_ReceiveShowTime_toggled(bool checked)
 {
     rx_show_time = checked;
-    db_ctrl->OpenDB();
+    db_ctrl->openDB();
     if (checked) {
-        db_ctrl->UpdateSetting("rx_show_time", "1");
+        db_ctrl->updateSetting("rx_show_time", "1");
     } else {
-        db_ctrl->UpdateSetting("rx_show_time", "0");
+        db_ctrl->updateSetting("rx_show_time", "0");
     }
-    db_ctrl->CloseDB();
+    db_ctrl->closeDB();
 }
 
 void MainWindow::on_checkBox_SendAsHex_toggled(bool checked)
 {
     tx_as_hex = checked;
-    db_ctrl->OpenDB();
+    db_ctrl->openDB();
     if (checked) {
-        db_ctrl->UpdateSetting("tx_as_hex", "1");
+        db_ctrl->updateSetting("tx_as_hex", "1");
     } else {
-        db_ctrl->UpdateSetting("tx_as_hex", "0");
+        db_ctrl->updateSetting("tx_as_hex", "0");
     }
-    db_ctrl->CloseDB();
+    db_ctrl->closeDB();
 }
 
 void MainWindow::on_checkBox_SendAutoNewLine_toggled(bool checked)
 {
     tx_new_line = checked;
-    db_ctrl->OpenDB();
+    db_ctrl->openDB();
     if (checked) {
-        db_ctrl->UpdateSetting("tx_new_line", "1");
+        db_ctrl->updateSetting("tx_new_line", "1");
     } else {
-        db_ctrl->UpdateSetting("tx_new_line", "0");
+        db_ctrl->updateSetting("tx_new_line", "0");
     }
-    db_ctrl->CloseDB();
+    db_ctrl->closeDB();
 }
 
 void MainWindow::on_comboBox_BaundRate_currentTextChanged(const QString &arg1)
 {
-    db_ctrl->OpenDB();
-    db_ctrl->UpdateSetting("baundrate", arg1);
-    db_ctrl->CloseDB();
+    db_ctrl->openDB();
+    db_ctrl->updateSetting("baundrate", arg1);
+    db_ctrl->closeDB();
+}
+
+void MainWindow::on_actionLoadSetting_triggered()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, ("Open Setting"), "", tr("DB Files (*.db)"), nullptr);
+    if (!fileName.isNull()) {
+        QString dst = QCoreApplication::applicationDirPath() + "/" + DB_NAME;
+        qDebug() << "Dst :" << dst;
+        if (!QFile::copy(fileName, dst)) {
+            QMessageBox::warning(nullptr, "Failed!", "Load Failed!");
+        } else {
+            QMessageBox::information(nullptr, "Success!", "Load success.");
+        }
+    }
+}
+
+void MainWindow::on_actionSaveSetting_triggered()
+{
+    QDateTime time = QDateTime::currentDateTime();
+    QString fileName_str = time.toString("yyyy-MM-dd----hh-mm-ss");
+    QByteArray filename_ba = fileName_str.toLatin1();
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Setting"), filename_ba, tr("DB Files (*.db)"));
+
+    if (!fileName.isNull()) {
+        if (!QFile::copy(DB_NAME, fileName)) {
+            QMessageBox::warning(nullptr, "Failed!", "Save Failed!");
+        } else {
+            QMessageBox::information(nullptr, "Success!", "Save success.");
+        }
+    }
 }

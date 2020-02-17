@@ -2,7 +2,7 @@
 
 DB_Ctrl::DB_Ctrl() {}
 
-bool DB_Ctrl::OpenDB()
+bool DB_Ctrl::openDB()
 {
     if (QSqlDatabase::contains(DB_NAME)) {
         db = QSqlDatabase::database(DB_NAME);
@@ -10,13 +10,13 @@ bool DB_Ctrl::OpenDB()
         db = QSqlDatabase::addDatabase("QSQLITE", DB_NAME);
         db.setDatabaseName(DB_NAME);
         if (db.open()) {
-            if (CreateCmdTable()) {
+            if (createCmdTable()) {
                 qDebug() << "Create Command Table Success";
             } else {
                 qDebug() << "Create Command Table Failed or NO Need to Create";
             }
-            if (CreateSettingTable()) {
-                InsertDefaultSetting();
+            if (createSettingTable()) {
+                insertDefaultSetting();
                 qDebug() << "Create Setting Table Success";
             } else {
                 qDebug() << "Create Setting Table Failed or NO Need to Create";
@@ -35,12 +35,12 @@ bool DB_Ctrl::OpenDB()
     }
 }
 
-void DB_Ctrl::CloseDB()
+void DB_Ctrl::closeDB()
 {
     db.close();
 }
 
-bool DB_Ctrl::CreateCmdTable()
+bool DB_Ctrl::createCmdTable()
 {
     QSqlQuery query(db);
     QString create_sql = "create table command ( \
@@ -59,7 +59,7 @@ bool DB_Ctrl::CreateCmdTable()
     }
 }
 
-bool DB_Ctrl::DeleteCmdTable()
+bool DB_Ctrl::deleteCmdTable()
 {
     QSqlQuery query(db);
     QString sql_exec = "drop table command";
@@ -77,7 +77,7 @@ bool DB_Ctrl::DeleteCmdTable()
     }
 }
 
-bool DB_Ctrl::InsertCommand(const int &row, const QString &name, const bool &hex, const QString &cmd)
+bool DB_Ctrl::insertCommand(const int &row, const QString &name, const bool &hex, const QString &cmd)
 {
     QSqlQuery query(db);
     QString insert_sql = "INSERT INTO command \
@@ -100,7 +100,7 @@ bool DB_Ctrl::InsertCommand(const int &row, const QString &name, const bool &hex
     }
 }
 
-bool DB_Ctrl::UpdateCommand(const int &row, const QString &name, const bool &hex, const QString &cmd)
+bool DB_Ctrl::updateCommand(const int &row, const QString &name, const bool &hex, const QString &cmd)
 {
     QSqlQuery query(db);
     QString sql = "UPDATE command SET name=:name,hex=:hex,cmd=:cmd WHERE id=:id";
@@ -120,7 +120,7 @@ bool DB_Ctrl::UpdateCommand(const int &row, const QString &name, const bool &hex
     }
 }
 
-bool DB_Ctrl::ReadCommand(const int &row, QString &name, bool &hex, QString &cmd)
+bool DB_Ctrl::getCommand(const int &row, QString &name, bool &hex, QString &cmd)
 {
     QSqlQuery query(db);
     QString sql = "SELECT * FROM command WHERE id=:id";
@@ -143,7 +143,7 @@ bool DB_Ctrl::ReadCommand(const int &row, QString &name, bool &hex, QString &cmd
     }
 }
 
-bool DB_Ctrl::DeleteCommand(const int &row)
+bool DB_Ctrl::deleteCommand(const int &row)
 {
     QSqlQuery query(db);
     QString sql = "DELETE FROM command WHERE id=:id";
@@ -160,7 +160,7 @@ bool DB_Ctrl::DeleteCommand(const int &row)
     }
 }
 
-int DB_Ctrl::GetCommandNum()
+int DB_Ctrl::getCommandNum()
 {
     QSqlQuery query(db);
     QString sql = "SELECT COUNT(*) FROM command";
@@ -180,7 +180,7 @@ int DB_Ctrl::GetCommandNum()
     return result;
 }
 
-bool DB_Ctrl::DeleteSettingTable()
+bool DB_Ctrl::deleteSettingTable()
 {
     QSqlQuery query(db);
     QString sql_exec = "drop table user_setting";
@@ -198,7 +198,7 @@ bool DB_Ctrl::DeleteSettingTable()
     }
 }
 
-bool DB_Ctrl::CreateSettingTable()
+bool DB_Ctrl::createSettingTable()
 {
     QSqlQuery query(db);
     QString create_sql = "create table user_setting ( \
@@ -217,7 +217,7 @@ bool DB_Ctrl::CreateSettingTable()
     }
 }
 
-bool DB_Ctrl::InsertSetting(const QString &parameter, const QString &value)
+bool DB_Ctrl::insertSetting(const QString &parameter, const QString &value)
 {
     QSqlQuery query(db);
     QString insert_sql = "INSERT INTO user_setting \
@@ -242,7 +242,7 @@ bool DB_Ctrl::InsertSetting(const QString &parameter, const QString &value)
     }
 }
 
-bool DB_Ctrl::UpdateSetting(const QString &parameter, const QString &value)
+bool DB_Ctrl::updateSetting(const QString &parameter, const QString &value)
 {
     QSqlQuery query(db);
     QString sql = "UPDATE user_setting SET value=:value WHERE parameter=:parameter";
@@ -254,14 +254,14 @@ bool DB_Ctrl::UpdateSetting(const QString &parameter, const QString &value)
     if (!query.exec()) {
         qDebug() << query.lastError();
         // if database has not this parameter, try to insert it.
-        return InsertSetting(parameter, value);
+        return insertSetting(parameter, value);
     } else {
         qDebug() << "Update Parameter Succes : " << parameter << " --> " << value;
         return true;
     }
 }
 
-bool DB_Ctrl::ReadSetting(const QString &parameter, QString &value)
+bool DB_Ctrl::getSetting(const QString &parameter, QString &value)
 {
     QSqlQuery query(db);
     QString sql = "SELECT * FROM user_setting WHERE parameter=:parameter";
@@ -287,25 +287,25 @@ bool DB_Ctrl::ReadSetting(const QString &parameter, QString &value)
     }
 }
 
-void DB_Ctrl::InsertDefaultSetting()
+void DB_Ctrl::insertDefaultSetting()
 {
     // Default Mode
-    InsertSetting("mode", "0"); // 0-> Lite, 1->Full;
+    insertSetting("mode", "0"); // 0-> Lite, 1->Full;
 
     // Plotting->LineColor
-    InsertSetting("line_color_r", "0");
-    InsertSetting("line_color_g", "0");
-    InsertSetting("line_color_b", "255");
+    insertSetting("line_color_r", "0");
+    insertSetting("line_color_g", "0");
+    insertSetting("line_color_b", "255");
 
-    InsertSetting("tx_end_str", "\n"); // End String
-    InsertSetting("rx_end_str", "\n"); // End String
+    insertSetting("tx_end_str", "\n"); // End String
+    insertSetting("rx_end_str", "\n"); // End String
 
-    InsertSetting("rx_as_hex", "0");
-    InsertSetting("rx_new_line", "0");
-    InsertSetting("rx_show_time", "0");
+    insertSetting("rx_as_hex", "0");
+    insertSetting("rx_new_line", "0");
+    insertSetting("rx_show_time", "0");
 
-    InsertSetting("tx_as_hex", "0");
-    InsertSetting("tx_new_line", "0");
+    insertSetting("tx_as_hex", "0");
+    insertSetting("tx_new_line", "0");
 
-    InsertSetting("baundrate", "115200");
+    insertSetting("baundrate", "115200");
 }

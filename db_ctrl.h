@@ -17,26 +17,26 @@ class DB_Ctrl
     DB_Ctrl();
 
     // Open&Close DB
-    bool OpenDB();
-    void CloseDB();
+    bool openDB();
+    void closeDB();
 
     // Command Table
-    bool CreateCmdTable();
-    bool DeleteCmdTable();
-    bool InsertCommand(const int &row, const QString &name, const bool &hex, const QString &cmd);
-    bool UpdateCommand(const int &row, const QString &name, const bool &hex, const QString &cmd);
-    bool ReadCommand(const int &row, QString &name, bool &hex, QString &cmd);
-    bool DeleteCommand(const int &row);
-    int GetCommandNum();
+    bool createCmdTable();
+    bool deleteCmdTable();
+    bool insertCommand(const int &row, const QString &name, const bool &hex, const QString &cmd);
+    bool updateCommand(const int &row, const QString &name, const bool &hex, const QString &cmd);
+    bool getCommand(const int &row, QString &name, bool &hex, QString &cmd);
+    bool deleteCommand(const int &row);
+    int getCommandNum();
 
     // Setting Table
-    bool DeleteSettingTable();
-    bool CreateSettingTable();
-    bool InsertSetting(const QString &parameter, const QString &value);
-    bool UpdateSetting(const QString &parameter, const QString &value);
-    bool ReadSetting(const QString &parameter, QString &value);
-    bool DeleteSetting(const QString &parameter);
-    void InsertDefaultSetting();
+    bool deleteSettingTable();
+    bool createSettingTable();
+    bool insertSetting(const QString &parameter, const QString &value);
+    bool updateSetting(const QString &parameter, const QString &value);
+    bool getSetting(const QString &parameter, QString &value);
+    bool deleteSetting(const QString &parameter);
+    void insertDefaultSetting();
 
   private:
     QSqlDatabase db;
