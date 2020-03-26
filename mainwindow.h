@@ -178,6 +178,8 @@ class MainWindow : public QMainWindow
     DB_Ctrl *db_ctrl;
     QLabel *comStatus;
 
+    QByteArray rx_buffer;
+
     int receive_cnt;
     int send_cnt;
 

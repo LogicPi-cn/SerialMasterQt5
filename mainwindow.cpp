@@ -347,7 +347,11 @@ void MainWindow::ReceiveData()
         return;
     }
 
-    qDebug() << "msg length:" << msg.length();
+    // copy to rx_buffer for plotting
+    rx_buffer = msg;
+
+    int len = msg.length();
+    qDebug() << "msg length:" << len;
 
     bool showtime = ui->checkBox_ReceiveShowTime->isChecked();
     bool hex = ui->checkBox_ReceiveAsHex->isChecked();
