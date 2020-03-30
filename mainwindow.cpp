@@ -758,7 +758,7 @@ void MainWindow::CheckUpdate()
 
 void MainWindow::replyFinished(QNetworkReply *reply)
 {
-    QString str = reply->readAll();
+    QString str = QString::fromUtf8(reply->readAll());
     parse_UpdateJSON(str);
     reply->deleteLater();
 }
