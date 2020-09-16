@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     MainWindow::on_pushButton_SendClear_clicked();
     MainWindow::on_pushButton_ReceiveClear_clicked();
     receive_cnt = 0;
-    send_cnt = 0;
+    send_cnt    = 0;
 
     // InitLayout
     InitLayout();
@@ -43,7 +43,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     LoadSetting();
 
     // Check Update
-    CheckUpdate();
+    //    CheckUpdate();
+    ui->actionUpdate->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -54,7 +55,7 @@ MainWindow::~MainWindow()
 void MainWindow::LogPrint(const QString msg)
 {
     QDateTime time = QDateTime::currentDateTime();
-    QString str = time.toString("yyyy-MM-dd hh:mm:ss.zzz ") + msg;
+    QString   str  = time.toString("yyyy-MM-dd hh:mm:ss.zzz ") + msg;
     ui->textEdit_Log->append(str);
 }
 
@@ -74,7 +75,7 @@ void MainWindow::StringToHex(QString str, QByteArray &senddata)
 {
     int hexdata, lowhexdata;
     int hexdatalen = 0;
-    int len = str.length();
+    int len        = str.length();
 
     if (len % 2 == 1) //如果发送的数据个数为奇数的，则在前面最后落单的字符前添加一个字符0
     {
@@ -95,8 +96,8 @@ void MainWindow::StringToHex(QString str, QByteArray &senddata)
         i++;
         if (i >= len)
             break;
-        lstr = str[i].toLatin1();
-        hexdata = ConvertHexChar(hstr);
+        lstr       = str[i].toLatin1();
+        hexdata    = ConvertHexChar(hstr);
         lowhexdata = ConvertHexChar(lstr);
         if ((hexdata == 16) || (lowhexdata == 16))
             break;
@@ -242,8 +243,8 @@ void MainWindow::InitCmdTable()
 void MainWindow::AddEmptyRowInCommandTable(const int &row, const bool &hex)
 {
     // add checkbox
-    QWidget *pWidget_checkbox = new QWidget();
-    QCheckBox *checkbox = new QCheckBox();
+    QWidget *    pWidget_checkbox = new QWidget();
+    QCheckBox *  checkbox         = new QCheckBox();
     QHBoxLayout *pLayout_checkbox = new QHBoxLayout(pWidget_checkbox);
     pLayout_checkbox->addWidget(checkbox);
     pLayout_checkbox->setAlignment(Qt::AlignCenter);
@@ -254,8 +255,8 @@ void MainWindow::AddEmptyRowInCommandTable(const int &row, const bool &hex)
     checkbox->setChecked(hex);
 
     // add pushbutton
-    QWidget *pWidget = new QWidget();
-    QPushButton *btn = new QPushButton("Send");
+    QWidget *    pWidget = new QWidget();
+    QPushButton *btn     = new QPushButton("Send");
     QHBoxLayout *pLayout = new QHBoxLayout(pWidget);
     pLayout->addWidget(btn);
     pLayout->setAlignment(Qt::AlignCenter);
@@ -279,7 +280,7 @@ void MainWindow::RefreshCmdTable()
     for (int i = 0; i < row_cnt; i++) {
         // Read a command from db
         QString name;
-        bool hex;
+        bool    hex;
         QString cmd;
         if (db_ctrl->getCommand(i, name, hex, cmd)) {
             qDebug() << "Read Command:" << i << name << hex << cmd;
@@ -305,9 +306,9 @@ void MainWindow::SendTableCommand(const int &row)
     qDebug() << "Row:" << row;
     const QString cmd = ui->tableWidget_SendCmd->item(row, 2)->text();
     qDebug() << "Command:" << cmd;
-    QWidget *pWidget = ui->tableWidget_SendCmd->cellWidget(row, 1);
+    QWidget *  pWidget  = ui->tableWidget_SendCmd->cellWidget(row, 1);
     QCheckBox *checkbox = pWidget->findChild<QCheckBox *>();
-    bool hex;
+    bool       hex;
     if (checkbox && checkbox->isChecked()) {
         hex = true;
     } else {
@@ -354,12 +355,12 @@ void MainWindow::ReceiveData()
     qDebug() << "msg length:" << len;
 
     bool showtime = ui->checkBox_ReceiveShowTime->isChecked();
-    bool hex = ui->checkBox_ReceiveAsHex->isChecked();
-    bool newline = ui->checkBox_ReceiveAutoNewLine->isChecked();
+    bool hex      = ui->checkBox_ReceiveAsHex->isChecked();
+    bool newline  = ui->checkBox_ReceiveAutoNewLine->isChecked();
 
     if (showtime) {
         QDateTime time = QDateTime::currentDateTime();
-        QString str = time.toString("yyyy-MM-dd hh:mm:ss.zzz : ");
+        QString   str  = time.toString("yyyy-MM-dd hh:mm:ss.zzz : ");
         ui->textEdit_Receive->moveCursor(QTextCursor::End);
         ui->textEdit_Receive->insertPlainText(str);
         ui->textEdit_Receive->moveCursor(QTextCursor::End);
@@ -378,10 +379,14 @@ void MainWindow::ReceiveData()
     }
 
     if (showtime) {
-        ui->textEdit_Receive->append(rx_end_str);
+        ui->textEdit_Receive->moveCursor(QTextCursor::End);
+        ui->textEdit_Receive->insertPlainText(rx_end_str);
+        ui->textEdit_Receive->moveCursor(QTextCursor::End);
     } else {
         if (newline) {
-            ui->textEdit_Receive->append(rx_end_str);
+            ui->textEdit_Receive->moveCursor(QTextCursor::End);
+            ui->textEdit_Receive->insertPlainText(rx_end_str);
+            ui->textEdit_Receive->moveCursor(QTextCursor::End);
         }
     }
 
@@ -393,16 +398,17 @@ void MainWindow::ReceiveData()
 void MainWindow::RegHandler()
 {
     // Hot Plug
-    HDEVNOTIFY hDevNotify;
+    HDEVNOTIFY                    hDevNotify;
     DEV_BROADCAST_DEVICEINTERFACE NotifacationFiler;
     ZeroMemory(&NotifacationFiler, sizeof(DEV_BROADCAST_DEVICEINTERFACE));
-    NotifacationFiler.dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
+    NotifacationFiler.dbcc_size       = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
     NotifacationFiler.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
 
     // Register
     for (int i = 0; i < sizeof(GUID_DEVINTERFACE_LIST) / sizeof(GUID); i++) {
         NotifacationFiler.dbcc_classguid = GUID_DEVINTERFACE_LIST[i]; //
-        hDevNotify = RegisterDeviceNotification((HANDLE)this->winId(), &NotifacationFiler, DEVICE_NOTIFY_WINDOW_HANDLE);
+        hDevNotify = RegisterDeviceNotification((HANDLE)this->winId(), &NotifacationFiler,
+                                                DEVICE_NOTIFY_WINDOW_HANDLE);
         if (!hDevNotify) {
             int Err = GetLastError();
             qDebug() << "Failed to Register" << Err;
@@ -412,8 +418,8 @@ void MainWindow::RegHandler()
 
 bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
 {
-    MSG *msg = reinterpret_cast<MSG *>(message);
-    int msgType = msg->message;
+    MSG *msg     = reinterpret_cast<MSG *>(message);
+    int  msgType = msg->message;
     if (msgType == WM_DEVICECHANGE) {
         PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)msg->lParam;
         switch (msg->wParam) {
@@ -446,29 +452,29 @@ void MainWindow::FullLayout()
     removeDockWidget(ui->dockWidget_Log);
     removeDockWidget(ui->dockWidget_CmdSend);
     //    removeDockWidget(ui->dockWidget_Receive);
-    removeDockWidget(ui->dockWidget_Setting);
+    //    removeDockWidget(ui->dockWidget_Setting);
 
     // Add Dockwidget
-    addDockWidget(Qt::LeftDockWidgetArea, ui->dockWidget_Setting);
+    //    addDockWidget(Qt::LeftDockWidgetArea, ui->dockWidget_Setting);
     //    splitDockWidget(ui->dockWidget_Setting, ui->dockWidget_Receive, Qt::Horizontal);
     //    splitDockWidget(ui->dockWidget_Receive, ui->dockWidget_CmdSend, Qt::Horizontal);
     addDockWidget(Qt::RightDockWidgetArea, ui->dockWidget_CmdSend);
     addDockWidget(Qt::BottomDockWidgetArea, ui->dockWidget_Log);
 
     QDesktopWidget *desktopWidget = QApplication::desktop();
-    QRect deskRect = desktopWidget->availableGeometry(this);
-    QRect screenRect = desktopWidget->screenGeometry(this);
+    QRect           deskRect      = desktopWidget->availableGeometry(this);
+    QRect           screenRect    = desktopWidget->screenGeometry(this);
 
     int g_nActScreenX = screenRect.width();
     int g_nActScreenY = screenRect.height();
-    int desk_width = deskRect.width();
-    int desk_height = deskRect.height();
+    int desk_width    = deskRect.width();
+    int desk_height   = deskRect.height();
 
     qDebug() << "Screen Size:" << g_nActScreenX << g_nActScreenY;
     qDebug() << "Desktop Size:" << desk_width << desk_height;
 
     // Set Size
-    ui->dockWidget_Setting->setMaximumWidth(250);
+    //    ui->dockWidget_Setting->setMaximumWidth(250);
     ui->dockWidget_Log->setMaximumHeight(desk_height / 5);
     ui->textEdit_Send->setMaximumHeight(100);
 
@@ -476,7 +482,7 @@ void MainWindow::FullLayout()
     ui->dockWidget_Log->show();
     ui->dockWidget_CmdSend->show();
     //    ui->dockWidget_Receive->show();
-    ui->dockWidget_Setting->show();
+    //    ui->dockWidget_Setting->show();
 
     // Maximize
     setWindowState(Qt::WindowMaximized);
@@ -487,16 +493,16 @@ void MainWindow::LiteLayout()
     // Remove all dockwidget
     removeDockWidget(ui->dockWidget_Log);
     removeDockWidget(ui->dockWidget_CmdSend);
-    removeDockWidget(ui->dockWidget_Setting);
+    //    removeDockWidget(ui->dockWidget_Setting);
 
     // Add Dockwidget
-    addDockWidget(Qt::LeftDockWidgetArea, ui->dockWidget_Setting);
+    //    addDockWidget(Qt::LeftDockWidgetArea, ui->dockWidget_Setting);
 
     // Show
-    ui->dockWidget_Setting->show();
+    //    ui->dockWidget_Setting->show();
 
     // Set Size
-    ui->dockWidget_Setting->setMaximumWidth(250);
+    //    ui->dockWidget_Setting->setMaximumWidth(250);
     ui->textEdit_Send->setMaximumHeight(100);
 
     resize(640, 480);
@@ -505,7 +511,7 @@ void MainWindow::LiteLayout()
 void MainWindow::on_actionStart_triggered()
 {
     QString portName = ui->comboBox_Port->currentText();
-    int bps = ui->comboBox_BaundRate->currentText().toInt();
+    int     bps      = ui->comboBox_BaundRate->currentText().toInt();
 
     m_serial->setPortName(portName);
     if (!m_serial->open(QIODevice::ReadWrite)) {
@@ -513,19 +519,26 @@ void MainWindow::on_actionStart_triggered()
         return;
     } else {
         if (bps == 115200) {
-            m_serial->setBaudRate(QSerialPort::Baud115200, QSerialPort::AllDirections); //设置波特率和读写方向
+            m_serial->setBaudRate(QSerialPort::Baud115200,
+                                  QSerialPort::AllDirections); //设置波特率和读写方向
         } else if (bps == 38400) {
-            m_serial->setBaudRate(QSerialPort::Baud38400, QSerialPort::AllDirections); //设置波特率和读写方向
+            m_serial->setBaudRate(QSerialPort::Baud38400,
+                                  QSerialPort::AllDirections); //设置波特率和读写方向
         } else if (bps == 57600) {
-            m_serial->setBaudRate(QSerialPort::Baud57600, QSerialPort::AllDirections); //设置波特率和读写方向
+            m_serial->setBaudRate(QSerialPort::Baud57600,
+                                  QSerialPort::AllDirections); //设置波特率和读写方向
         } else if (bps == 19200) {
-            m_serial->setBaudRate(QSerialPort::Baud19200, QSerialPort::AllDirections); //设置波特率和读写方向
+            m_serial->setBaudRate(QSerialPort::Baud19200,
+                                  QSerialPort::AllDirections); //设置波特率和读写方向
         } else if (bps == 9600) {
-            m_serial->setBaudRate(QSerialPort::Baud9600, QSerialPort::AllDirections); //设置波特率和读写方向
+            m_serial->setBaudRate(QSerialPort::Baud9600,
+                                  QSerialPort::AllDirections); //设置波特率和读写方向
         } else if (bps == 4800) {
-            m_serial->setBaudRate(QSerialPort::Baud9600, QSerialPort::AllDirections); //设置波特率和读写方向
+            m_serial->setBaudRate(QSerialPort::Baud9600,
+                                  QSerialPort::AllDirections); //设置波特率和读写方向
         } else {
-            m_serial->setBaudRate(QSerialPort::Baud115200, QSerialPort::AllDirections); //设置波特率和读写方向
+            m_serial->setBaudRate(QSerialPort::Baud115200,
+                                  QSerialPort::AllDirections); //设置波特率和读写方向
         }
 
         m_serial->setDataBits(QSerialPort::Data8);            //数据位为8位
@@ -575,7 +588,7 @@ void MainWindow::on_pushButton_SendClear_clicked()
 void MainWindow::on_pushButton_Send_clicked()
 {
     if (m_serial->isOpen()) {
-        QString msg = ui->textEdit_Send->toPlainText();
+        QString    msg = ui->textEdit_Send->toPlainText();
         QByteArray send_buf;
 
         // HEX or not
@@ -647,21 +660,23 @@ void MainWindow::on_pushButton_SaveAllCmd_clicked()
         // check if Blank
         QString name = "";
         if (ui->tableWidget_SendCmd->item(i, 0) == nullptr ||
-            (ui->tableWidget_SendCmd->item(i, 0) && ui->tableWidget_SendCmd->item(i, 0)->text() == tr(""))) {
+            (ui->tableWidget_SendCmd->item(i, 0) &&
+             ui->tableWidget_SendCmd->item(i, 0)->text() == tr(""))) {
         } else {
             name = ui->tableWidget_SendCmd->item(i, 0)->text();
         }
 
         QString cmd = "";
         if (ui->tableWidget_SendCmd->item(i, 2) == nullptr ||
-            (ui->tableWidget_SendCmd->item(i, 2) && ui->tableWidget_SendCmd->item(i, 2)->text() == tr(""))) {
+            (ui->tableWidget_SendCmd->item(i, 2) &&
+             ui->tableWidget_SendCmd->item(i, 2)->text() == tr(""))) {
         } else {
             cmd = ui->tableWidget_SendCmd->item(i, 2)->text();
         }
 
-        QWidget *pWidget = ui->tableWidget_SendCmd->cellWidget(i, 1);
+        QWidget *  pWidget  = ui->tableWidget_SendCmd->cellWidget(i, 1);
         QCheckBox *checkbox = pWidget->findChild<QCheckBox *>();
-        bool hex;
+        bool       hex;
         if (checkbox && checkbox->isChecked()) {
             hex = true;
         } else {
@@ -703,8 +718,7 @@ void MainWindow::on_pushButton_ClearLog_clicked()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    Form_About *form = new Form_About();
-    form->show();
+    QMessageBox::about(this, (QString("About")), tr("By LogicPi Ltd, all rights reserved."));
 }
 
 void MainWindow::on_actionUpdate_triggered()
@@ -715,22 +729,23 @@ void MainWindow::on_actionUpdate_triggered()
 int MainWindow::parse_UpdateJSON(QString str)
 {
     QJsonParseError err_rpt;
-    QJsonDocument root_Doc = QJsonDocument::fromJson(str.toUtf8(), &err_rpt);
+    QJsonDocument   root_Doc = QJsonDocument::fromJson(str.toUtf8(), &err_rpt);
     if (err_rpt.error != QJsonParseError::NoError) {
         QMessageBox::critical(this, "Check Failed", "Connection Error!");
         return -1;
     }
     if (root_Doc.isObject()) {
-        QJsonObject root_Obj = root_Doc.object();
-        QJsonObject PulseValue = root_Obj.value("PO").toObject();
-        QString NewVerison = PulseValue.value("LatestVerison").toString();
-        QString Url = PulseValue.value("Url").toString();
-        QString UpdateTime = PulseValue.value("UpdateTime").toString();
-        QString ReleaseNote = PulseValue.value("ReleaseNote").toString();
+        QJsonObject root_Obj    = root_Doc.object();
+        QJsonObject PulseValue  = root_Obj.value("PO").toObject();
+        QString     NewVerison  = PulseValue.value("LatestVerison").toString();
+        QString     Url         = PulseValue.value("Url").toString();
+        QString     UpdateTime  = PulseValue.value("UpdateTime").toString();
+        QString     ReleaseNote = PulseValue.value("ReleaseNote").toString();
 
         qDebug() << "Server Version:" << NewVerison;
         if (NewVerison > QString(VERSION)) {
-            QString warningStr = "Update Find!\nVersion:" + NewVerison + "\n" + "Description:" + ReleaseNote;
+            QString warningStr =
+                "Update Find!\nVersion:" + NewVerison + "\n" + "Description:" + ReleaseNote;
             int ret = QMessageBox::warning(this, "Check Update", warningStr, "Download", "Cancel");
             if (ret == 0) {
                 QDesktopServices::openUrl(QUrl(Url));
@@ -868,7 +883,8 @@ void MainWindow::InitPlotLayout()
     gridlayout_Setting->addWidget(groupBox_CurveColor, 1, 0, 1, 1);
     gridlayout_Setting->addWidget(groupBox_DataStop, 2, 0, 1, 1);
 
-    QSpacerItem *verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QSpacerItem *verticalSpacer =
+        new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     gridlayout_Setting->addItem(verticalSpacer, 5, 0, 1, 1);
 
     // Main Grid
@@ -895,7 +911,7 @@ void MainWindow::on_actionFull_triggered()
 void MainWindow::on_checkBox_SendLoop_toggled(bool checked)
 {
     bool ok;
-    int interval = ui->lineEdit_SendLoopInterval->text().toInt(&ok);
+    int  interval = ui->lineEdit_SendLoopInterval->text().toInt(&ok);
     if (!ok) {
         qDebug() << "Convert to Int Failed.";
         return;
@@ -909,7 +925,7 @@ void MainWindow::on_checkBox_SendLoop_toggled(bool checked)
     if (checked) {
         qDebug() << "Timer Start, Interval :" << interval;
         m_pThread = new QThread();
-        m_pTimer = new QTimer();
+        m_pTimer  = new QTimer();
         m_pTimer->moveToThread(m_pThread);
         m_pTimer->setInterval(interval);
         connect(m_pThread, SIGNAL(started()), m_pTimer, SLOT(start()));
@@ -931,12 +947,9 @@ void MainWindow::on_actionSetting_triggered()
 
 void MainWindow::on_actionLoadDefault_triggered()
 {
-    QMessageBox::StandardButton rb =
-        QMessageBox::warning(nullptr,
-                             "Notice!",
-                             "All user settings and data will be lost, would like to continue?",
-                             QMessageBox::Yes | QMessageBox::No,
-                             QMessageBox::No);
+    QMessageBox::StandardButton rb = QMessageBox::warning(
+        nullptr, "Notice!", "All user settings and data will be lost, would like to continue?",
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if (rb == QMessageBox::Yes) {
         db_ctrl->openDB();
         db_ctrl->deleteSettingTable();
@@ -1017,7 +1030,8 @@ void MainWindow::on_comboBox_BaundRate_currentTextChanged(const QString &arg1)
 
 void MainWindow::on_actionLoadSetting_triggered()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, ("Open Setting"), "", tr("DB Files (*.db)"), nullptr);
+    QString fileName =
+        QFileDialog::getOpenFileName(this, ("Open Setting"), "", tr("DB Files (*.db)"), nullptr);
     if (!fileName.isNull()) {
         QString dst = QCoreApplication::applicationDirPath() + "/" + DB_NAME;
         qDebug() << "Dst :" << dst;
@@ -1031,11 +1045,12 @@ void MainWindow::on_actionLoadSetting_triggered()
 
 void MainWindow::on_actionSaveSetting_triggered()
 {
-    QDateTime time = QDateTime::currentDateTime();
-    QString fileName_str = time.toString("yyyy-MM-dd----hh-mm-ss");
-    QByteArray filename_ba = fileName_str.toLatin1();
+    QDateTime  time         = QDateTime::currentDateTime();
+    QString    fileName_str = time.toString("yyyy-MM-dd----hh-mm-ss");
+    QByteArray filename_ba  = fileName_str.toLatin1();
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Setting"), filename_ba, tr("DB Files (*.db)"));
+    QString fileName =
+        QFileDialog::getSaveFileName(this, tr("Save Setting"), filename_ba, tr("DB Files (*.db)"));
 
     if (!fileName.isNull()) {
         if (!QFile::copy(DB_NAME, fileName)) {

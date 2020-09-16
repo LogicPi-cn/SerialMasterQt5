@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define VERSION "V1.3"
+#define VERSION "V1.4"
 // Crypted or NOT
 //#define CRYPTED
 

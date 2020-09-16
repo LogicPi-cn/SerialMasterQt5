@@ -87,17 +87,6 @@ class MainWindow : public QMainWindow
     void AddEmptyRowInCommandTable(const int &row, const bool &hex);
     void RefreshCmdTable();
 
-    char FirstDriveFromMask(ULONG unitmask)
-    {
-        char i;
-        for (i = 0; i < 26; ++i) {
-            if (unitmask & 0x1)
-                break;
-            unitmask = unitmask >> 1;
-        }
-        return (i + 'A');
-    }
-
     // for Update
     QNetworkAccessManager *manager;    // network requester
     int parse_UpdateJSON(QString str); // json parser

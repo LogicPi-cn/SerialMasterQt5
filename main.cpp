@@ -7,9 +7,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     // Splash Screen On
-    QPixmap pixmap(":/icon/LogicPi.cn.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
+    //    QPixmap pixmap(":/icon/LogicPi.cn.png");
+    //    QSplashScreen splash(pixmap);
+    //    splash.show();
 
     // Delay
     //    QDateTime n = QDateTime::currentDateTime();
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     w.show();
 
     // Close
-    splash.finish(&w);
+    //    splash.finish(&w);
 
     return a.exec();
 }
